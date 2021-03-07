@@ -33,6 +33,7 @@ if [[ $1 == 'train' ]]; then
         --batch_size 56 \
         --gpu0_bsz 14 \
         --multi_gpu \
+        --use_gpus 0 1 2 3 \
         ${@:2}
 elif [[ $1 == 'eval' ]]; then
     echo 'Not supported yet'

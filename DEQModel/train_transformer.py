@@ -107,6 +107,8 @@ parser.add_argument('--seed', type=int, default=1111,
                     help='random seed')
 parser.add_argument('--cuda', action='store_true',
                     help='use CUDA')
+parser.add_argument('--use_gpus', type=int, nargs='*',
+                    help='gpus to use')
 parser.add_argument('--eval', action='store_true',
                     help='evaluation mode')
 parser.add_argument('--adaptive', action='store_true',
@@ -285,10 +287,12 @@ else:
 
 args.n_all_param = sum([p.nelement() for p in model.parameters() if p.requires_grad])
 
+print(args.use_gpus)
+
 if args.multi_gpu:
     model = model.to(device)
     if args.gpu0_bsz >= 0:
-        para_model = BalancedDataParallel(args.gpu0_bsz // args.batch_chunk, model, dim=1).to(device)
+        para_model = BalancedDataParallel(args.gpu0_bsz // args.batch_chunk, model, device_ids = args.use_gpus, dim=1).to(device)
     else:
         para_model = nn.DataParallel(model, dim=1).to(device)
 else:
