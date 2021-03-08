@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(description='PyTorch DEQ Sequence Model')
 parser.add_argument('--data', type=str, default='../data/wikitext-103',
                     help='location of the data corpus (default to the WT103 path)')
 parser.add_argument('--dataset', type=str, default='wt103',
-                    choices=['wt103'],
+        choices=['wt103', 'ptb'],
                     help='dataset name')
 parser.add_argument('--n_layer', type=int, default=12,
                     help='number of total layers')
@@ -93,6 +93,8 @@ parser.add_argument('--n_experts', type=int, default=0,
                     help='number of softmax experts (default: 0)')
 parser.add_argument('--multi_gpu', action='store_true',
                     help='use multiple GPU')
+parser.add_argument('--use_gpus', type=int, nargs='*',
+                    help='gpus to use')
 parser.add_argument('--f_thres', type=int, default=50,
                     help='forward pass Broyden threshold')
 parser.add_argument('--b_thres', type=int, default=80,
@@ -175,7 +177,7 @@ args.n_all_param = sum([p.nelement() for p in model.parameters() if p.requires_g
 if args.multi_gpu:
     model = model.to(device)
     if args.gpu0_bsz >= 0:
-        para_model = BalancedDataParallel(args.gpu0_bsz // args.batch_chunk, model, dim=1).to(device)   # Batch dim is dim 1
+        para_model = BalancedDataParallel(args.gpu0_bsz // args.batch_chunk, model, device_ids=args.use_gpus, dim=1).to(device)   # Batch dim is dim 1
     else:
         para_model = nn.DataParallel(model, dim=1).to(device)
 else:

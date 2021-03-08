@@ -16,7 +16,7 @@ if [[ $1 == 'train' ]]; then
         --dropouth 0.1 \
         --optim Adam \
         --lr 1e-3 \
-        --pretrain_steps 30000 \
+        --pretrain_steps 15000 \
         --seq_len 100 \
         --subseq_len 50 \
         --f_thres 45 \
@@ -24,6 +24,7 @@ if [[ $1 == 'train' ]]; then
         --batch_size 49 \
         --gpu0_bsz 7 \
         --multi_gpu \
+        --use_gpus 0 1 2 3 \
         ${@:2}
 elif [[ $1 == 'eval' ]]; then
     echo 'Not supported yet'
