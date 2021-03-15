@@ -179,7 +179,7 @@ if args.multi_gpu:
     if args.gpu0_bsz >= 0:
         para_model = BalancedDataParallel(args.gpu0_bsz // args.batch_chunk, model, device_ids=args.use_gpus, dim=1).to(device)   # Batch dim is dim 1
     else:
-        para_model = nn.DataParallel(model, dim=1).to(device)
+        para_model = nn.DataParallel(model, device_ids=args.use_gpus, dim=1).to(device)
 else:
     para_model = model.to(device)
     

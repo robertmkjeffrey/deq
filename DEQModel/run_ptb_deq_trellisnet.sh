@@ -17,7 +17,6 @@ if [[ $1 == 'train' ]]; then
         --emb_dropout 0.1 \
         --dropouth 0.28 \
         --weight_decay 1.2e-6 \
-        --wnorm \
         --optim Adam \
         --lr 1e-3 \
         --anneal 5 \
