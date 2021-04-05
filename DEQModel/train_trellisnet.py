@@ -195,6 +195,15 @@ for k, v in args.__dict__.items():
 logging('=' * 100)
 logging(f'#params = {args.n_all_param}')
 
+# # Print model's state_dict
+# print("Model's state_dict:")
+# for param_tensor in model.state_dict():
+#     print(param_tensor, "\t", model.state_dict()[param_tensor].size())
+
+# print("\nModel's parameter shapes:")
+# for param_tensor in model.parameters():
+#     print(param_tensor.shape)
+
 ###############################################################################
 # Training code
 ###############################################################################
@@ -348,6 +357,7 @@ except KeyboardInterrupt:
 # Load the best saved model.
 with open(os.path.join(args.work_dir, 'model.pt'), 'rb') as f:
     model = torch.load(f)
+
 para_model = model.to(device)
 
 # Run on test data.

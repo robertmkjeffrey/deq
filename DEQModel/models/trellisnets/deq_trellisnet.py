@@ -298,6 +298,24 @@ class DEQTrellisNetLM(nn.Module):
         # 3) Load model
         if len(load) > 0:
             params_dict = torch.load(load)
+            # If the saved weights come from a trellisnet
+            if "tnet.module.full_conv.bias2" in params_dict.keys():
+                new_params_dict = {}
+                new_params_dict['encoder.weight'] = params_dict['encoder.weight']
+                new_params_dict['decoder.bias'] = params_dict['decoder.bias']
+                new_params_dict['decoder.weight'] = params_dict['decoder.weight']
+                new_params_dict["trellisnet.func.full_conv.weight"] =  params_dict["tnet.module.full_conv.weight2_raw"]
+                new_params_dict["trellisnet.func.full_conv.bias"] = params_dict["tnet.module.full_conv.bias2"]
+                new_params_dict["trellisnet.func_copy.full_conv.weight"] = params_dict["tnet.module.full_conv.weight2_raw"]
+                new_params_dict["trellisnet.func_copy.full_conv.bias"] = params_dict["tnet.module.full_conv.bias2"]
+                new_params_dict["trellisnet.inject_conv.weight"] = params_dict["tnet.module.full_conv.weight1_raw"]
+                new_params_dict["trellisnet.inject_conv.bias"] = torch.zeros_like(params_dict["tnet.module.full_conv.bias2"])
+                new_params_dict["trellisnet.deq.func.full_conv.weight"] = params_dict["tnet.module.full_conv.weight2_raw"]
+                new_params_dict["trellisnet.deq.func.full_conv.bias"] = params_dict["tnet.module.full_conv.bias2"]
+                new_params_dict["trellisnet.deq.func_copy.full_conv.weight"] = params_dict["tnet.module.full_conv.weight2_raw"]
+                new_params_dict["trellisnet.deq.func_copy.full_conv.bias"] = params_dict["tnet.module.full_conv.bias2"]
+                params_dict = new_params_dict
+                print("Loading from TrellisNet")
             self.load_weights(params_dict)
             print(f"Finished loading. d_embed={self.trellisnet.inject_conv.weight.data.size(1)}")
 
@@ -313,8 +331,8 @@ class DEQTrellisNetLM(nn.Module):
         self.decoder.bias.data.fill_(0)
         self.decoder.weight.data.uniform_(-initrange, initrange)    
         
-    def load_weights(self, params_dict):
-        self.load_state_dict(params_dict)
+    def load_weights(self, state_dict):
+        self.load_state_dict(state_dict)
    
     def save_weights(self, name='pretrained_deq'):
         with open(f'{name}.pkl', 'wb') as f:
