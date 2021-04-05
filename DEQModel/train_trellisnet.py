@@ -25,7 +25,7 @@ parser.add_argument('--dataset', type=str, default='wt103',
         choices=['wt103', 'ptb'],
                     help='dataset name')
 parser.add_argument('--n_layer', type=int, default=12,
-                    help='number of total layers')
+                    help='number of total layers') # Depth of pretraining network.
 parser.add_argument('--d_embed', type=int, default=500,
                     help='size of word embeddings')
 parser.add_argument('--nhid', type=int, default=1400,
