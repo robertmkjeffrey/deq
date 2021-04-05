@@ -147,6 +147,9 @@ if torch.cuda.is_available():
     else:
         torch.set_default_tensor_type('torch.cuda.FloatTensor')
         torch.cuda.manual_seed_all(args.seed)
+        # Set the default device to be the smallest GPU
+        if devices is not None:
+            torch.cuda.set_device(devices[0])
 
 device = torch.device('cuda' if args.cuda else 'cpu')
 
