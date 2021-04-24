@@ -38,6 +38,8 @@ parser.add_argument('--nout', type=int, default=500,
                     help='number of output units')
 parser.add_argument('--epochs', type=int, default=25,
                     help='upper epoch limit (default: 25)')
+parser.add_argument('--halt_ppl', type=float, default=None,
+                    help='validation perplexity to halt at (default: None)')
 
 # Optimizers
 parser.add_argument('--optim', default='Adam', type=str,
@@ -157,6 +159,7 @@ if torch.cuda.is_available():
         torch.cuda.manual_seed_all(args.seed)
         # Set the default device to be the smallest GPU
         if devices is not None:
+            args.multi_gpu = len(devices) > 1
             torch.cuda.set_device(devices[0])
 
 device = torch.device('cuda' if args.cuda else 'cpu')
@@ -246,7 +249,7 @@ def evaluate(eval_iter):
                              output.contiguous().view(-1, output.size(2)), target.view(-1))
             total_loss += seq_len * loss.item()
             total_len += seq_len
-    
+
     model.train()
     return total_loss / total_len
 
@@ -346,7 +349,6 @@ try:
         if args.epochs is not None:
             if epoch == args.epochs:
                 break
-        
         train()
         val_loss = evaluate(va_iter)
         logging('-' * 100)
@@ -385,7 +387,11 @@ try:
             print("*" * 89 + "\n")
 
         all_val_losses.append(val_loss)
-        
+
+        # Early stopping criteria
+        if args.halt_ppl is not None and math.exp(val_loss) < args.halt_ppl:
+            break
+
 except KeyboardInterrupt:
     logging('-' * 100)
     logging('Exiting from training early')

@@ -30,6 +30,7 @@ if [[ $1 == 'train' ]]; then
         --gpu0_bsz 7 \
         --multi_gpu \
         --epoch 190 \
+        --halt_ppl 75 \
         --name experiment \
         ${@:2}
 elif [[ $1 == 'eval' ]]; then
