@@ -5,6 +5,7 @@ import math
 import os, sys
 import itertools
 import numpy as np
+import csv
 
 import torch
 import torch.nn as nn
@@ -17,6 +18,9 @@ from utils.exp_utils import create_exp_dir
 from utils.data_parallel import BalancedDataParallel
 from utils.splitcross import *
 
+import time
+
+test_prediction = True
 
 parser = argparse.ArgumentParser(description='PyTorch DEQ Sequence Model')
 parser.add_argument('--data', type=str, default='../data/wikitext-103',
@@ -138,9 +142,13 @@ args.work_dir = os.path.join(args.work_dir, time.strftime('%Y%m%d-%H%M%S'))
 logging = create_exp_dir(args.work_dir,
     scripts_to_save=['train_trellisnet.py', 'models/trellisnets/deq_trellisnet.py'], debug=args.debug)
 
+result_log = []
+result_log.append(("Epoch", "Total Runtime", "Validation Perplexity"))
+
 # Set the random seed manually for reproducibility.
 np.random.seed(args.seed)
 torch.manual_seed(args.seed)
+devices = args.use_gpus
 if torch.cuda.is_available():
     if not args.cuda:
         print('WARNING: You have a CUDA device, so you should probably run with --cuda')
@@ -210,6 +218,13 @@ logging(f'#params = {args.n_all_param}')
 ###############################################################################
 # Training code
 ###############################################################################
+
+# Timing Code
+
+start_time = time.process_time()
+
+
+
 
 def evaluate(eval_iter):
     global train_step
@@ -303,6 +318,16 @@ log_start_time = time.time()
 eval_start_time = time.time()
 
 if args.eval:
+
+    if test_prediction:
+        print("Shape:")
+        prediction_test_data = torch.zeros_like(next(iter(te_iter))[0]).t()
+        # prediction_hidden = model.init_hidden(test_batch_size)
+        # print(prediction_hidden)
+        print("\nZero output")
+        print(model(prediction_test_data, None, None, train_step=0))
+        sys.exit(0)
+
     epoch = -1
     valid_loss = evaluate(va_iter)
     logging('=' * 100)
@@ -318,15 +343,23 @@ if args.eval:
 # At any point you can hit Ctrl + C to break out of training early.
 try:
     for epoch in itertools.count(start=1):
+        if args.epochs is not None:
+            if epoch == args.epochs:
+                break
+        
         train()
         val_loss = evaluate(va_iter)
         logging('-' * 100)
+        total_runtime = time.process_time() - start_time 
         log_str = '| Eval {:3d} at step {:>8d} | time: {:5.2f}s ' \
                   '| valid loss {:5.2f} | valid ppl {:9.3f}'.format(
             eval_count, train_step,
             (time.time() - eval_start_time), val_loss, math.exp(val_loss))
         logging(log_str)
+        logging(f"| Total time: {total_runtime:.2f}")
         logging('-' * 100)
+        
+        result_log.append((epoch, total_runtime, math.exp(val_loss)))
         
         eval_start_time = time.time()
         eval_count += 1
@@ -356,6 +389,11 @@ try:
 except KeyboardInterrupt:
     logging('-' * 100)
     logging('Exiting from training early')
+
+# Write training log
+with open(os.path.join(args.work_dir, "results.csv"), "w") as f:
+    writer = csv.writer(f)
+    writer.writerows(result_log)
 
 # Load the best saved model.
 with open(os.path.join(args.work_dir, 'model.pt'), 'rb') as f:
