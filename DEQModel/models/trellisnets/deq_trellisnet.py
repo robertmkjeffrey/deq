@@ -239,7 +239,7 @@ class DEQTrellisNet(nn.Module):
         """
         return Z[:,:,-1:]
 
-    def forward(self, X, z0, f_thres=50, b_thres=80, train_step=-1, subseq_len=40):
+    def forward(self, X, z0, analytics, f_thres=50, b_thres=80, train_step=-1, subseq_len=40):
         z1s = self.transform_input(X)  # Dimension (bsz x total_hsize x seq_len)
         bsz, _, seq_len = z1s.shape
         if z0 is None or z0.nelement() == 0:
@@ -257,6 +257,15 @@ class DEQTrellisNet(nn.Module):
                 z1s = self.func(z1s, us, z0)
         else:
             z1s = self.deq(z1s, us, z0, threshold=f_thres, train_step=train_step, subseq_len=subseq_len)
+
+        # Get forward pass statistics
+        if analytics is not None:
+            with torch.no_grad():
+                if "convergence_gap" in analytics:
+                    z1s_f = self.func(z1s, us, z0)
+                    analytics["convergence_gap"] = torch.norm(z1s_f - z1s) / torch.norm(z1s)
+
+
         out = self.get_output(z1s).transpose(1, 2)   # Dimension (bsz x seq_len x n_out)
         z0 = self.get_history(z1s)                   # Dimension (bsz x total_hsize x 1)
 
@@ -339,7 +348,7 @@ class DEQTrellisNetLM(nn.Module):
             print(f"Saving weights at {name}.pkl")
             torch.save(self.state_dict(), f)
             
-    def _forward(self, dec_inp, subseq_len, mems=None, f_thres=30, b_thres=40, train_step=-1, decode=True):
+    def _forward(self, dec_inp, subseq_len, analytics, mems=None, f_thres=30, b_thres=40, train_step=-1, decode=True):
         """
         Apply the DEQ-TrellisNet language model on input word tokens
 
@@ -356,7 +365,7 @@ class DEQTrellisNetLM(nn.Module):
         word_emb = embedded_dropout(self.encoder, dec_inp, self.emb_dropout if self.training else 0.0)
         word_emb = self.iodrop(word_emb, self.dropouti).transpose(1, 2)           # (bsz x seq_len x d_model)
 
-        z1s, new_mems = self.trellisnet(word_emb, mems, f_thres=f_thres, b_thres=b_thres, 
+        z1s, new_mems = self.trellisnet(word_emb, mems, analytics, f_thres=f_thres, b_thres=b_thres, 
                                         train_step=train_step, subseq_len=subseq_len)
         core_out = self.iodrop(z1s, self.dropout)
         decoded = None
@@ -371,7 +380,7 @@ class DEQTrellisNetLM(nn.Module):
         
         return (z1s.transpose(0,1), core_out.transpose(0,1), core_out.transpose(0,1)), [new_mems.permute(2,0,1)]
 
-    def forward(self, data, target, mems, train_step=-1, **kwargs):
+    def forward(self, data, target, mems, train_step=-1, analytics=None, **kwargs):
         bsz = data.size(1)
         if not mems:
             mems = [torch.zeros(1, bsz, 2*self.h_size).to(data.device)]
@@ -384,7 +393,7 @@ class DEQTrellisNetLM(nn.Module):
 
         # Note: We can also implement and use the AdaptiveSoftmax for DEQ-TrellisNet here (the same way as in the
         # Transformer network)
-        ret = self._forward(data, subseq_len, mems, f_thres=f_thres, b_thres=b_thres, train_step=train_step, decode=decode)
+        ret = self._forward(data, subseq_len, analytics, mems, f_thres=f_thres, b_thres=b_thres, train_step=train_step, decode=decode)
         assert ret[0][0].size(1) == bsz, "Output must have dimension (seq_len x bsz x nout)"
         assert ret[1][0].size(1) == bsz, "New mem must have dimension (1 x bsz x 2*h_size)"
         return ret

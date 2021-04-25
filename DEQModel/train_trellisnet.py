@@ -235,7 +235,7 @@ def evaluate(eval_iter):
     subseq_len = args.subseq_len
 
     # Evaluation
-    total_len, total_loss = 0, 0.
+    total_len, total_loss, total_convergence_gap, max_convergence_gap = 0, 0., 0., 0.
     with torch.no_grad():
         mems = []
         for i, (data, target, seq_len) in enumerate(eval_iter):
@@ -243,15 +243,18 @@ def evaluate(eval_iter):
                 mems[0] = mems[0].detach()
             
             # output has dimension (seq_len x bsz x nout)
+            analytics={'convergence_gap':None}
             (_, _, output), mems = model(data, target, mems, train_step=train_step, f_thres=args.f_thres, 
-                                         b_thres=args.b_thres, subseq_len=subseq_len, decode=False)  
+                                         b_thres=args.b_thres, subseq_len=subseq_len, decode=False, analytics=analytics) 
             loss = criterion(model.decoder.weight, model.decoder.bias, 
                              output.contiguous().view(-1, output.size(2)), target.view(-1))
             total_loss += seq_len * loss.item()
             total_len += seq_len
+            total_convergence_gap += analytics['convergence_gap']
+            max_convergence_gap = max(max_convergence_gap, analytics['convergence_gap'])
 
     model.train()
-    return total_loss / total_len
+    return total_loss / total_len, (total_convergence_gap/total_len, max_convergence_gap)
 
 
 def train():
@@ -332,12 +335,12 @@ if args.eval:
         sys.exit(0)
 
     epoch = -1
-    valid_loss = evaluate(va_iter)
+    valid_loss, _ = evaluate(va_iter)
     logging('=' * 100)
     logging('| End of training | valid loss {:5.2f} | valid ppl {:9.3f}'.format(valid_loss, math.exp(valid_loss)))
     logging('=' * 100)
         
-    test_loss = evaluate(te_iter)
+    test_loss, _ = evaluate(te_iter)
     logging('=' * 100)
     logging('| End of training | test loss {:5.2f} | test ppl {:9.3f}'.format(test_loss, math.exp(test_loss)))
     logging('=' * 100)
@@ -350,7 +353,7 @@ try:
             if epoch == args.epochs:
                 break
         train()
-        val_loss = evaluate(va_iter)
+        val_loss, (val_av_cg, val_max_cg) = evaluate(va_iter)
         logging('-' * 100)
         total_runtime = time.process_time() - start_time 
         log_str = '| Eval {:3d} at step {:>8d} | time: {:5.2f}s ' \
@@ -358,7 +361,7 @@ try:
             eval_count, train_step,
             (time.time() - eval_start_time), val_loss, math.exp(val_loss))
         logging(log_str)
-        logging(f"| Total time: {total_runtime:.2f}")
+        logging(f"| Total time: {total_runtime:.2f} | Average convergence gap: {val_av_cg*100:.2f}% | Max convergence gap: {val_max_cg*100:.2f}%")
         logging('-' * 100)
         
         result_log.append((epoch, total_runtime, math.exp(val_loss)))
@@ -397,9 +400,10 @@ except KeyboardInterrupt:
     logging('Exiting from training early')
 
 # Write training log
-with open(os.path.join(args.work_dir, "results.csv"), "w") as f:
-    writer = csv.writer(f)
-    writer.writerows(result_log)
+if not args.debug:
+    with open(os.path.join(args.work_dir, "results.csv"), "w") as f:
+        writer = csv.writer(f)
+        writer.writerows(result_log)
 
 # Load the best saved model.
 with open(os.path.join(args.work_dir, 'model.pt'), 'rb') as f:
@@ -408,7 +412,7 @@ with open(os.path.join(args.work_dir, 'model.pt'), 'rb') as f:
 para_model = model.to(device)
 
 # Run on test data.
-test_loss = evaluate(te_iter)
+test_loss, _ = evaluate(te_iter)
 logging('=' * 100)
 logging('| End of training | test loss {:5.2f} | test ppl {:9.3f}'.format(test_loss, math.exp(test_loss)))
 logging('=' * 100)
