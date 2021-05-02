@@ -40,6 +40,8 @@ parser.add_argument('--epochs', type=int, default=25,
                     help='upper epoch limit (default: 25)')
 parser.add_argument('--halt_ppl', type=float, default=None,
                     help='validation perplexity to halt at (default: None)')
+parser.add_argument('--time_limit', type=float, default=None,
+                    help='process time to halt after (default: None)')
 
 # Optimizers
 parser.add_argument('--optim', default='Adam', type=str,
@@ -145,7 +147,7 @@ logging = create_exp_dir(args.work_dir,
     scripts_to_save=['train_trellisnet.py', 'models/trellisnets/deq_trellisnet.py'], debug=args.debug)
 
 result_log = []
-result_log.append(("Epoch", "Total Runtime", "Validation Perplexity"))
+result_log.append(("Epoch", "Total Runtime", "Validation Perplexity", "Average Convergence Cap", "Maximum Convergence Gap"))
 
 # Set the random seed manually for reproducibility.
 np.random.seed(args.seed)
@@ -223,42 +225,58 @@ logging(f'#params = {args.n_all_param}')
 ###############################################################################
 
 # Timing Code
-
 start_time = time.process_time()
 
-
+pretraining_end = False
+smoothing = 0.0001
 
 
 def evaluate(eval_iter):
-    global train_step
+    global train_step, pretraining_end
     model.eval()
     subseq_len = args.subseq_len
 
     # Evaluation
-    total_len, total_loss, total_convergence_gap, max_convergence_gap = 0, 0., 0., 0.
+    total_len, total_loss, total_convergence_gap, max_convergence_gap, conversion_change = 0, 0., 0., 0., 0.
     with torch.no_grad():
         mems = []
         for i, (data, target, seq_len) in enumerate(eval_iter):
             if mems:
-                mems[0] = mems[0].detach()
-            
+                mems[0] = mems[0].detach() 
+
+            if pretraining_end:
+                # Get the pretraining output
+                (_, _, pretraining_output), _ = model(data, target, mems, train_step=args.start_train_steps, f_thres=args.f_thres,
+                                                                    b_thres=args.b_thres, subseq_len=subseq_len, decode=False)
+                # TODO - optional conversion (diagonal method)
+
             # output has dimension (seq_len x bsz x nout)
-            analytics={'convergence_gap':None}
-            (_, _, output), mems = model(data, target, mems, train_step=train_step, f_thres=args.f_thres, 
+            analytics={'convergence_gap':None, "cg_smoothing": smoothing}
+            (_, _, output), _ = model(data, target, mems, train_step=train_step, f_thres=args.f_thres, 
                                          b_thres=args.b_thres, subseq_len=subseq_len, decode=False, analytics=analytics) 
             loss = criterion(model.decoder.weight, model.decoder.bias, 
                              output.contiguous().view(-1, output.size(2)), target.view(-1))
             total_loss += seq_len * loss.item()
             total_len += seq_len
-            total_convergence_gap += analytics['convergence_gap']
-            max_convergence_gap = max(max_convergence_gap, analytics['convergence_gap'])
+            total_convergence_gap += float(analytics['convergence_gap'])
+            max_convergence_gap = max(max_convergence_gap, float(analytics['convergence_gap']))
+
+            if pretraining_end:
+                conversion_change += float((torch.norm(output - pretraining_output)+smoothing) / (torch.norm(pretraining_output)+smoothing))
+
+    # once we've converted the model, clear the flag
+    if pretraining_end:
+        conversion_change /= total_len
+        pretraining_end = False
+    else:
+        conversion_change = None
 
     model.train()
-    return total_loss / total_len, (total_convergence_gap/total_len, max_convergence_gap)
+    return total_loss / total_len, (total_convergence_gap/total_len, max_convergence_gap, conversion_change)
 
 
 def train():
-    global train_step, log_start_time
+    global train_step, log_start_time, pretraining_end
     model.train()
     subseq_len = args.subseq_len
 
@@ -299,8 +317,12 @@ def train():
             
         torch.nn.utils.clip_grad_norm_(params, args.clip)
         optimizer.step()
-        train_step += 1
+        train_step += 1 
         
+        # Set flag when pretraining ends.
+        if train_step == args.pretrain_steps:
+            pretraining_end = True
+
         # Logging of training progress
         if train_step % args.log_interval == 0:
             cur_loss = train_loss / args.log_interval
@@ -352,8 +374,12 @@ try:
         if args.epochs is not None:
             if epoch == args.epochs:
                 break
+
+        if args.time_limit is not None:
+            if time.process_time() - start_time >= args.time_limit:
+                break
         train()
-        val_loss, (val_av_cg, val_max_cg) = evaluate(va_iter)
+        val_loss, (val_av_cg, val_max_cg, conversion_change) = evaluate(va_iter)
         logging('-' * 100)
         total_runtime = time.process_time() - start_time 
         log_str = '| Eval {:3d} at step {:>8d} | time: {:5.2f}s ' \
@@ -362,9 +388,11 @@ try:
             (time.time() - eval_start_time), val_loss, math.exp(val_loss))
         logging(log_str)
         logging(f"| Total time: {total_runtime:.2f} | Average convergence gap: {val_av_cg*100:.2f}% | Max convergence gap: {val_max_cg*100:.2f}%")
+        if conversion_change is not None:
+            logging(f"| Conversion complete, average change: {conversion_change*100:.2f}%")
         logging('-' * 100)
         
-        result_log.append((epoch, total_runtime, math.exp(val_loss)))
+        result_log.append((epoch, total_runtime, math.exp(val_loss), val_av_cg, val_max_cg))
         
         eval_start_time = time.time()
         eval_count += 1

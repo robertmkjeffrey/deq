@@ -262,8 +262,12 @@ class DEQTrellisNet(nn.Module):
         if analytics is not None:
             with torch.no_grad():
                 if "convergence_gap" in analytics:
+                    smoothing = 0.
+                    if "cg_smoothing" in analytics:
+                        smoothing = analytics['cg_smoothing']
+
                     z1s_f = self.func(z1s, us, z0)
-                    analytics["convergence_gap"] = torch.norm(z1s_f - z1s) / torch.norm(z1s)
+                    analytics["convergence_gap"] = (torch.norm(z1s_f - z1s)+smoothing) / (torch.norm(z1s)+smoothing)
 
 
         out = self.get_output(z1s).transpose(1, 2)   # Dimension (bsz x seq_len x n_out)

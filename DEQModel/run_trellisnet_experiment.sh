@@ -29,8 +29,8 @@ if [[ $1 == 'train' ]]; then
         --clip 0.225 \
         --gpu0_bsz 7 \
         --multi_gpu \
-        --epoch 190 \
-        --halt_ppl 75 \
+        --epoch 200 \
+        --time_limit 125000 \
         --name experiment \
         ${@:2}
 elif [[ $1 == 'eval' ]]; then
