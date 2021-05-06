@@ -121,6 +121,8 @@ parser.add_argument('--pretrain_steps', type=int, default=0,
                     help='number of pretrain steps')
 parser.add_argument('--start_train_steps', type=int, default=0,
                     help='starting training step count (default to 0)')
+parser.add_argument('--timing', action='store_true',
+                    help='disable features to time learning')
 parser.add_argument('--eval', action='store_true',
                     help='evaluation mode')
 parser.add_argument('--load', type=str, default='',
@@ -230,12 +232,28 @@ start_time = time.process_time()
 pretraining_end = False
 smoothing = 0.0001
 
+def log_gpu_usage():
+
+    for gpu in args.use_gpus:
+        logging(f"Max Memory Allocated on GPU {gpu}: {torch.cuda.max_memory_allocated(device=gpu)/1e6:.2f}MB")
+        logging(f"Current Memory Allocated on GPU {gpu}: {torch.cuda.memory_allocated(device=gpu)/1e6:.2f}MB")
+
+def get_gpu_usage():
+    current_mem, max_mem = 0., 0.
+    for gpu in args.use_gpus:
+        max_mem += torch.cuda.max_memory_allocated(device=gpu)
+        current_mem += torch.cuda.memory_allocated(device=gpu)
+
+def reset_gpu_usage():
+    for gpu in args.use_gpus:
+        torch.cuda.reset_peak_memory_stats(device=gpu)
+log_gpu_usage()
 
 def evaluate(eval_iter):
     global train_step, pretraining_end
     model.eval()
-    subseq_len = args.subseq_len
-
+    subseq_len = args.subseq_len 
+    
     # Evaluation
     total_len, total_loss, total_convergence_gap, max_convergence_gap, conversion_change = 0, 0., 0., 0., 0.
     with torch.no_grad():
@@ -244,28 +262,32 @@ def evaluate(eval_iter):
             if mems:
                 mems[0] = mems[0].detach() 
 
-            if pretraining_end:
-                # Get the pretraining output
+            if pretraining_end and not args.timing:
+                # Get the pretraining output for later comparison
                 (_, _, pretraining_output), _ = model(data, target, mems, train_step=args.start_train_steps, f_thres=args.f_thres,
                                                                     b_thres=args.b_thres, subseq_len=subseq_len, decode=False)
                 # TODO - optional conversion (diagonal method)
-
+            
+            # add convergence analytics unless timing. 
+            analytics={'convergence_gap':None, "cg_smoothing": smoothing} if not args.timing else {}
+            
             # output has dimension (seq_len x bsz x nout)
-            analytics={'convergence_gap':None, "cg_smoothing": smoothing}
             (_, _, output), _ = model(data, target, mems, train_step=train_step, f_thres=args.f_thres, 
                                          b_thres=args.b_thres, subseq_len=subseq_len, decode=False, analytics=analytics) 
+            
             loss = criterion(model.decoder.weight, model.decoder.bias, 
                              output.contiguous().view(-1, output.size(2)), target.view(-1))
             total_loss += seq_len * loss.item()
             total_len += seq_len
-            total_convergence_gap += float(analytics['convergence_gap'])
-            max_convergence_gap = max(max_convergence_gap, float(analytics['convergence_gap']))
+            if not args.timing:
+                total_convergence_gap += float(analytics['convergence_gap'])
+                max_convergence_gap = max(max_convergence_gap, float(analytics['convergence_gap']))
 
-            if pretraining_end:
+            if pretraining_end and not args.timing:
                 conversion_change += float((torch.norm(output - pretraining_output)+smoothing) / (torch.norm(pretraining_output)+smoothing))
 
     # once we've converted the model, clear the flag
-    if pretraining_end:
+    if pretraining_end and not args.timing:
         conversion_change /= total_len
         pretraining_end = False
     else:
@@ -347,15 +369,6 @@ eval_start_time = time.time()
 
 if args.eval:
 
-    if test_prediction:
-        print("Shape:")
-        prediction_test_data = torch.zeros_like(next(iter(te_iter))[0]).t()
-        # prediction_hidden = model.init_hidden(test_batch_size)
-        # print(prediction_hidden)
-        print("\nZero output")
-        print(model(prediction_test_data, None, None, train_step=0))
-        sys.exit(0)
-
     epoch = -1
     valid_loss, _ = evaluate(va_iter)
     logging('=' * 100)
@@ -387,7 +400,11 @@ try:
             eval_count, train_step,
             (time.time() - eval_start_time), val_loss, math.exp(val_loss))
         logging(log_str)
-        logging(f"| Total time: {total_runtime:.2f} | Average convergence gap: {val_av_cg*100:.2f}% | Max convergence gap: {val_max_cg*100:.2f}%")
+        if args.timing:
+            logging(f"| Total time: {total_runtime:.2f}s")
+        else:
+            logging(f"| Total time: {total_runtime:.2f} | Average convergence gap: {val_av_cg*100:.2f}% | Max convergence gap: {val_max_cg*100:.2f}%")
+        
         if conversion_change is not None:
             logging(f"| Conversion complete, average change: {conversion_change*100:.2f}%")
         logging('-' * 100)
