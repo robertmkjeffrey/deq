@@ -123,6 +123,8 @@ parser.add_argument('--start_train_steps', type=int, default=0,
                     help='starting training step count (default to 0)')
 parser.add_argument('--timing', action='store_true',
                     help='disable features to time learning')
+parser.add_argument('--eval_mem', action='store_true',
+                    help='only test for maximum GPU memory usage')
 parser.add_argument('--eval', action='store_true',
                     help='evaluation mode')
 parser.add_argument('--load', type=str, default='',
@@ -136,7 +138,6 @@ args.pretrain_steps += args.start_train_steps
 print(f"Experiment name: {args.name}")
 assert args.seq_len > 0, "For now you must set seq_len > 0 when using deq"
 args.work_dir += "deq"
-args.cuda = torch.cuda.is_available()
     
 if args.d_embed < 0:
     args.d_embed = args.nout
@@ -151,20 +152,33 @@ logging = create_exp_dir(args.work_dir,
 result_log = []
 result_log.append(("Epoch", "Total Runtime", "Validation Perplexity", "Average Convergence Cap", "Maximum Convergence Gap"))
 
+# Set visable GPUs
+if args.use_gpus is not None and len(args.use_gpus)>0:
+    device_str = str(args.use_gpus)[1:-1]
+
+    print(args.use_gpus)
+    input()
+
+    print(f"Using GPUS {device_str}")
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0, 5"
+    print(torch.cuda.device_count())
+    input()
+
+args.cuda = torch.cuda.is_available()
+
 # Set the random seed manually for reproducibility.
 np.random.seed(args.seed)
 torch.manual_seed(args.seed)
-devices = args.use_gpus
+
+devices = range(torch.cuda.device_count())
+
 if torch.cuda.is_available():
     if not args.cuda:
         print('WARNING: You have a CUDA device, so you should probably run with --cuda')
     else:
         torch.set_default_tensor_type('torch.cuda.FloatTensor')
         torch.cuda.manual_seed_all(args.seed)
-        # Set the default device to be the smallest GPU
-        if devices is not None:
-            args.multi_gpu = len(devices) > 1
-            torch.cuda.set_device(devices[0])
+        args.multi_gpu = len(devices) > 1
 
 device = torch.device('cuda' if args.cuda else 'cpu')
 
@@ -184,6 +198,21 @@ te_iter = corpus.get_iterator('test', eval_batch_size, args.seq_len, device=devi
 cutoffs = [2800, 20000, 76000]    # This can be tuned.
 criterion = SplitCrossEntropyLoss(args.d_embed, splits=cutoffs, verbose=False) 
 
+def get_gpu_usage():
+    current_mem, max_mem = 0., 0.
+    for gpu in devices:
+        max_mem += torch.cuda.max_memory_allocated(device=gpu)
+        current_mem += torch.cuda.memory_allocated(device=gpu)
+    return current_mem, max_mem
+
+def reset_gpu_usage():
+    for gpu in devices:
+        torch.cuda.reset_peak_memory_stats(device=gpu)
+
+c_mem, m_mem = get_gpu_usage()
+logging(f"|Basic Memory Usage: {c_mem/1e6:.2f}MB current, {m_mem/1e6:.2f}MB max")
+
+
 model = DEQTrellisNetLM(n_token=ntokens, n_layer=args.n_layer, ninp=args.d_embed, nhid=args.nhid, nout=args.nout, 
                         kernel_size=args.ksize, emb_dropout=args.emb_dropout, dropouti=args.dropouti, dropout=args.dropout, 
                         dropouth=args.dropouth, wdrop=args.wdrop, wnorm=args.wnorm, tie_weights=args.tied, 
@@ -195,9 +224,9 @@ args.n_all_param = sum([p.nelement() for p in model.parameters() if p.requires_g
 if args.multi_gpu:
     model = model.to(device)
     if args.gpu0_bsz >= 0:
-        para_model = BalancedDataParallel(args.gpu0_bsz // args.batch_chunk, model, device_ids=args.use_gpus, dim=1).to(device)   # Batch dim is dim 1
+        para_model = BalancedDataParallel(args.gpu0_bsz // args.batch_chunk, model, dim=1).to(device)   # Batch dim is dim 1
     else:
-        para_model = nn.DataParallel(model, device_ids=args.use_gpus, dim=1).to(device)
+        para_model = nn.DataParallel(model, dim=1).to(device)
 else:
     para_model = model.to(device)
     
@@ -213,41 +242,12 @@ for k, v in args.__dict__.items():
 logging('=' * 100)
 logging(f'#params = {args.n_all_param}')
 
-# # Print model's state_dict
-# print("Model's state_dict:")
-# for param_tensor in model.state_dict():
-#     print(param_tensor, "\t", model.state_dict()[param_tensor].size())
-
-# print("\nModel's parameter shapes:")
-# for param_tensor in model.parameters():
-#     print(param_tensor.shape)
-
 ###############################################################################
 # Training code
 ###############################################################################
 
-# Timing Code
-start_time = time.process_time()
-
 pretraining_end = False
 smoothing = 0.0001
-
-def log_gpu_usage():
-
-    for gpu in args.use_gpus:
-        logging(f"Max Memory Allocated on GPU {gpu}: {torch.cuda.max_memory_allocated(device=gpu)/1e6:.2f}MB")
-        logging(f"Current Memory Allocated on GPU {gpu}: {torch.cuda.memory_allocated(device=gpu)/1e6:.2f}MB")
-
-def get_gpu_usage():
-    current_mem, max_mem = 0., 0.
-    for gpu in args.use_gpus:
-        max_mem += torch.cuda.max_memory_allocated(device=gpu)
-        current_mem += torch.cuda.memory_allocated(device=gpu)
-
-def reset_gpu_usage():
-    for gpu in args.use_gpus:
-        torch.cuda.reset_peak_memory_stats(device=gpu)
-log_gpu_usage()
 
 def evaluate(eval_iter):
     global train_step, pretraining_end
@@ -381,6 +381,32 @@ if args.eval:
     logging('=' * 100)
     sys.exit(0)
 
+
+
+c_mem, m_mem = get_gpu_usage()
+logging(f"|Static Memory Usage: {c_mem/1e6:.2f}MB current, {m_mem/1e6:.2f}MB max")
+
+if args.eval_mem:
+    
+    epoch = -1
+    
+    reset_gpu_usage()
+    train()
+    logging(f"|Training Memory Usage: {get_gpu_usage()[1]/1e6:.2f}MB")
+
+    reset_gpu_usage()
+    evaluate(va_iter)
+    logging(f"|Validation Memory Usage: {get_gpu_usage()[1]/1e6:.2f}MB")
+    
+    reset_gpu_usage()
+    evaluate(te_iter)
+    logging(f"|Test Memory Usage: {get_gpu_usage()[1]/1e6:.2f}MB")
+    sys.exit(0)
+# Timing Code
+start_time = time.process_time()
+
+reset_gpu_usage()
+
 # At any point you can hit Ctrl + C to break out of training early.
 try:
     for epoch in itertools.count(start=1):
@@ -460,4 +486,5 @@ para_model = model.to(device)
 test_loss, _ = evaluate(te_iter)
 logging('=' * 100)
 logging('| End of training | test loss {:5.2f} | test ppl {:9.3f}'.format(test_loss, math.exp(test_loss)))
+logging(f'| Maximum memory usage: {get_gpu_usage()[1]/1e-6:.2f}MB')
 logging('=' * 100)
