@@ -156,13 +156,7 @@ result_log.append(("Epoch", "Total Runtime", "Validation Perplexity", "Average C
 if args.use_gpus is not None and len(args.use_gpus)>0:
     device_str = str(args.use_gpus)[1:-1]
 
-    print(args.use_gpus)
-    input()
-
-    print(f"Using GPUS {device_str}")
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0, 5"
-    print(torch.cuda.device_count())
-    input()
+    os.environ["CUDA_VISIBLE_DEVICES"] = device_str
 
 args.cuda = torch.cuda.is_available()
 
