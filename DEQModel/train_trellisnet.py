@@ -409,7 +409,7 @@ try:
                 break
 
         if args.time_limit is not None:
-            if time.time() - start_time >= args.time_limit:
+            if time.process_time() - start_time >= args.time_limit:
                 break
         train()
         val_loss, (val_av_cg, val_max_cg, conversion_change) = evaluate(va_iter)
