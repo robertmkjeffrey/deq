@@ -29,7 +29,7 @@ if [[ $1 == 'train' ]]; then
         --clip 0.225 \
         --gpu0_bsz 7 \
         --multi_gpu \
-        --epoch 200 \
+        --epoch 500 \
         --time_limit 125000 \
         --name experiment \
         ${@:2}
