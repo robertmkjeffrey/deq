@@ -397,8 +397,7 @@ if args.eval_mem:
     logging(f"|Test Memory Usage: {get_gpu_usage()[1]/1e6:.2f}MB")
     sys.exit(0)
 # Timing Code
-start_ptime = time.process_time()
-start_wtime = time.time()
+start_time = time.process_time()
 
 reset_gpu_usage()
 
@@ -410,12 +409,12 @@ try:
                 break
 
         if args.time_limit is not None:
-            if time.time() - start_wtime >= args.time_limit:
+            if time.time() - start_time >= args.time_limit:
                 break
         train()
         val_loss, (val_av_cg, val_max_cg, conversion_change) = evaluate(va_iter)
         logging('-' * 100)
-        total_runtime = time.process_time() - start_ptime 
+        total_runtime = time.process_time() - start_time 
         log_str = '| Eval {:3d} at step {:>8d} | time: {:5.2f}s ' \
                   '| valid loss {:5.2f} | valid ppl {:9.3f}'.format(
             eval_count, train_step,
