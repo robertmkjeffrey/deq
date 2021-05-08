@@ -409,7 +409,7 @@ try:
                 break
 
         if args.time_limit is not None:
-            if time.time() - start_time >= args.time_limit:
+            if time.process_time() - start_time >= args.time_limit:
                 break
         train()
         val_loss, (val_av_cg, val_max_cg, conversion_change) = evaluate(va_iter)
@@ -456,6 +456,12 @@ try:
 
         all_val_losses.append(val_loss)
 
+        # Write training log
+        if not args.debug:
+            with open(os.path.join(args.work_dir, "results.csv"), "w") as f:
+                writer = csv.writer(f)
+                writer.writerows(result_log)
+
         # Early stopping criteria
         if args.halt_ppl is not None and math.exp(val_loss) < args.halt_ppl:
             break
@@ -464,11 +470,6 @@ except KeyboardInterrupt:
     logging('-' * 100)
     logging('Exiting from training early')
 
-# Write training log
-if not args.debug:
-    with open(os.path.join(args.work_dir, "results.csv"), "w") as f:
-        writer = csv.writer(f)
-        writer.writerows(result_log)
 
 # Load the best saved model.
 with open(os.path.join(args.work_dir, 'model.pt'), 'rb') as f:
