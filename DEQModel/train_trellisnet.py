@@ -145,7 +145,7 @@ if args.d_embed < 0:
 assert args.batch_size % args.batch_chunk == 0
 
 args.work_dir = '{}-{}'.format(args.work_dir, args.dataset)
-args.work_dir = os.path.join(args.work_dir, time.strftime('%Y%m%d-%H%M%S'))
+args.work_dir = os.path.join(args.work_dir, args.name + "_" + time.strftime('%Y%m%d-%H%M%S'))
 logging = create_exp_dir(args.work_dir,
     scripts_to_save=['train_trellisnet.py', 'models/trellisnets/deq_trellisnet.py'], debug=args.debug)
 
