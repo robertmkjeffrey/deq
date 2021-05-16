@@ -8,5 +8,5 @@ eval "$(/home/659/rj4139/miniconda3/bin/conda shell.bash hook)"
 conda activate honours
 
 cd ${DEQ_DIR}
-bash ${DEQ_DIR}/run_trellisnet_experiment.sh train --name 20d_15kl_unrolled_1 --n_layer 20 --pretrain_steps 15000 --seed 100 --timing --time_limit 16000
+bash ${DEQ_DIR}/run_trellisnet_experiment.sh train --name 20d_20kl_unrolled_1 --n_layer 20 --pretrain_steps 20000 --seed 100 --timing --time_limit 16000
 

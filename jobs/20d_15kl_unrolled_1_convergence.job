@@ -9,4 +9,4 @@
 #PBS -l wd
 #PBS -l storage=gdata/ll21
 
-./20d_15kl_unrolled_1.sh
+./20d_15kl_unrolled_1_convergence.sh

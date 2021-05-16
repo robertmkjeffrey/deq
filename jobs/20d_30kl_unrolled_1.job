@@ -7,5 +7,7 @@
 #PBS -l walltime=5:00:00
 #PBS -l mem=12GB
 #PBS -l wd
+#PBS -l storage=gdata/ll21
+
 
 ./20d_30kl_unrolled_1.sh
