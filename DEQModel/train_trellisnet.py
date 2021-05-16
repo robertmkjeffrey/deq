@@ -150,7 +150,7 @@ logging = create_exp_dir(args.work_dir,
     scripts_to_save=['train_trellisnet.py', 'models/trellisnets/deq_trellisnet.py'], debug=args.debug)
 
 result_log = []
-result_log.append(("Epoch", "Total Runtime", "Validation Perplexity", "Average Convergence Cap", "Maximum Convergence Gap"))
+result_log.append(("Epoch", "Total Runtime", "Validation Perplexity", "Average Convergence Gap", "Maximum Convergence Gap"))
 
 # Set visable GPUs
 if args.use_gpus is not None and len(args.use_gpus)>0:
