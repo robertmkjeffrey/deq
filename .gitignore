@@ -15,4 +15,4 @@ Mess/
 .ipynb_checkpoint/
 *.ipynb
 runs/
-jobs/*.job.*
+*.job.*
