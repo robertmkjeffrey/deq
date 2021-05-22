@@ -91,6 +91,8 @@ parser.add_argument('--anneal', type=int, default=5,
                     help='learning rate annealing criteria (default: 5)')
 parser.add_argument('--log-interval', type=int, default=100, metavar='N',
                     help='report interval')
+parser.add_argument('--force-deq-validation', type="store_true",
+                    help='always validate with rootfinding instead of unrolling')
 parser.add_argument('--when', nargs='+', type=int, default=[15, 20, 23],
                     help='When to decay the learning rate')
 parser.add_argument('--ksize', type=int, default=2,
@@ -256,7 +258,7 @@ def evaluate(eval_iter):
             if mems:
                 mems[0] = mems[0].detach() 
 
-            if pretraining_end and not args.timing:
+            if (args.force_deq_validation or pretraining_end) and not args.timing:
                 # Get the pretraining output for later comparison
                 (_, _, pretraining_output), _ = model(data, target, mems, train_step=args.start_train_steps, f_thres=args.f_thres,
                                                                     b_thres=args.b_thres, subseq_len=subseq_len, decode=False)
@@ -266,6 +268,7 @@ def evaluate(eval_iter):
             analytics={'convergence_gap':None, "cg_smoothing": smoothing} if not args.timing else {}
             
             # output has dimension (seq_len x bsz x nout)
+            logging_step = args.pretrain_steps if args.force_deq_validation else train_step # If we've forget DEQ logging, set the step to after pretraining.
             (_, _, output), _ = model(data, target, mems, train_step=train_step, f_thres=args.f_thres, 
                                          b_thres=args.b_thres, subseq_len=subseq_len, decode=False, analytics=analytics) 
             
@@ -277,7 +280,7 @@ def evaluate(eval_iter):
                 total_convergence_gap += float(analytics['convergence_gap'])
                 max_convergence_gap = max(max_convergence_gap, float(analytics['convergence_gap']))
 
-            if pretraining_end and not args.timing:
+            if (args.force_deq_validation or pretraining_end) and not args.timing:
                 conversion_change += float((torch.norm(output - pretraining_output)+smoothing) / (torch.norm(pretraining_output)+smoothing))
 
     # once we've converted the model, clear the flag
@@ -285,6 +288,8 @@ def evaluate(eval_iter):
         conversion_change /= total_len
         pretraining_end = False
         logging("!! Converted Model !!")
+    elif args.force_deq_validation:
+        conversion_change /= total_len
     else:
         conversion_change = None
 
