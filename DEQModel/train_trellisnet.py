@@ -284,6 +284,7 @@ def evaluate(eval_iter):
     if pretraining_end and not args.timing:
         conversion_change /= total_len
         pretraining_end = False
+        logging("!! Converted Model !!")
     else:
         conversion_change = None
 
