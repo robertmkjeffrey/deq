@@ -91,7 +91,7 @@ parser.add_argument('--anneal', type=int, default=5,
                     help='learning rate annealing criteria (default: 5)')
 parser.add_argument('--log-interval', type=int, default=100, metavar='N',
                     help='report interval')
-parser.add_argument('--force-deq-validation', type="store_true",
+parser.add_argument('--force-deq-validation', action="store_true",
                     help='always validate with rootfinding instead of unrolling')
 parser.add_argument('--when', nargs='+', type=int, default=[15, 20, 23],
                     help='When to decay the learning rate')
@@ -152,7 +152,7 @@ logging = create_exp_dir(args.work_dir,
     scripts_to_save=['train_trellisnet.py', 'models/trellisnets/deq_trellisnet.py'], debug=args.debug)
 
 result_log = []
-result_log.append(("Epoch", "Total Runtime", "Validation Perplexity", "Average Convergence Gap", "Maximum Convergence Gap"))
+result_log.append(("Epoch", "Total Runtime", "Training Perplexity", "Validation Perplexity", "Average Convergence Gap", "Maximum Convergence Gap"))
 
 # Set visable GPUs
 if args.use_gpus is not None and len(args.use_gpus)>0:
@@ -302,6 +302,8 @@ def train():
     model.train()
     subseq_len = args.subseq_len
 
+    total_train_loss = 0
+    total_len = 0
     train_loss = 0
     if args.batch_chunk > 1:
         mems = [[] for _ in range(args.batch_chunk)]  # Each chunk (apparent) should have its own memory padding
@@ -326,7 +328,10 @@ def train():
                 loss = loss / args.batch_chunk
                 loss.backward()
                 train_loss += loss.item()
-                
+
+                total_train_loss += seq_len * loss.item()
+                total_len += seq_len
+
         else:
             # Mode 2: Normal training with one batch per iteration
             if mems: mems[0] = mems[0].detach()
@@ -336,7 +341,10 @@ def train():
                              output.reshape(-1, output.size(2)), target.view(-1))
             loss.backward()
             train_loss += loss.item()
-            
+
+            total_train_loss += seq_len * loss.item()
+            total_len += seq_len
+
         torch.nn.utils.clip_grad_norm_(params, args.clip)
         optimizer.step()
         train_step += 1 
@@ -357,6 +365,9 @@ def train():
             train_loss = 0
             log_start_time = time.time()
     
+        
+    logging(f"| train loss: {total_train_loss/total_len:.2f} | train ppl {math.exp(total_train_loss/total_len):.3f}")
+    return total_train_loss / total_len
 
 # Loop over epochs.
 train_step = args.start_train_steps
@@ -417,7 +428,7 @@ try:
         if args.time_limit is not None:
             if time.process_time() - start_time >= args.time_limit:
                 break
-        train()
+        train_loss = train()
         val_loss, (val_av_cg, val_max_cg, conversion_change) = evaluate(va_iter)
         logging('-' * 100)
         total_runtime = time.process_time() - start_time 
@@ -435,7 +446,7 @@ try:
             logging(f"| Conversion complete, average change: {conversion_change*100:.2f}%")
         logging('-' * 100)
         
-        result_log.append((epoch, total_runtime, math.exp(val_loss), val_av_cg, val_max_cg))
+        result_log.append((epoch, total_runtime, math.exp(train_loss), math.exp(val_loss), val_av_cg, val_max_cg))
         
         eval_start_time = time.time()
         eval_count += 1
