@@ -1,0 +1,64 @@
+|Basic Memory Usage: 8.69MB current, 8.69MB max
+====================================================================================================
+    - data : ../data/penn/
+    - dataset : ptb
+    - n_layer : 40
+    - d_embed : 400
+    - nhid : 1000
+    - nout : 400
+    - epochs : 500
+    - halt_ppl : None
+    - time_limit : 125000.0
+    - optim : Adam
+    - lr : 0.01
+    - clip : 0.225
+    - batch_size : 32
+    - batch_chunk : 1
+    - seq_len : 110
+    - subseq_len : 55
+    - dropout : 0.45
+    - dropouti : 0.45
+    - wdrop : 0.5
+    - emb_dropout : 0.1
+    - dropouth : 0.28
+    - weight_decay : 1.2e-06
+    - wnorm : True
+    - seed : 9999
+    - cuda : True
+    - not_tied : False
+    - anneal : 10
+    - log_interval : 100
+    - force_deq_validation : False
+    - when : [-1]
+    - ksize : 2
+    - dilation : 1
+    - n_experts : 0
+    - multi_gpu : False
+    - use_gpus : None
+    - f_thres : 45
+    - b_thres : 45
+    - work_dir : LM-TREdeq-ptb/mem_40l_20210529-223804
+    - restart : False
+    - restart_dir : 
+    - debug : False
+    - gpu0_bsz : 7
+    - pretrain_steps : 15000
+    - start_train_steps : 0
+    - timing : True
+    - eval_mem : True
+    - eval : False
+    - load : 
+    - name : mem_40l
+    - tied : True
+    - n_token : 10000
+    - n_all_param : 24193603
+====================================================================================================
+#params = 24193603
+|Static Memory Usage: 252.25MB current, 269.03MB max
+| epoch  -1 step      100 |    100 batches | lr 0.01 | ms/batch 1104.09 | loss  6.45 | ppl   630.971
+| epoch  -1 step      200 |    200 batches | lr 0.01 | ms/batch 1102.16 | loss  5.81 | ppl   333.734
+| train loss: 6.02 | train ppl 412.127
+|Training Memory Usage: 6574.60MB
+|Training Inference Memory Usage: 1053.80MB
+|Validation Memory Usage: 703.95MB
+|Test Memory Usage: 703.95MB

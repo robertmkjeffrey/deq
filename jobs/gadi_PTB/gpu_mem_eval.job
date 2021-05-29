@@ -1,0 +1,13 @@
+#!/bin/bash
+
+#PBS -P ll21
+#PBS -q gpuvolta
+#PBS -l ncpus=12
+#PBS -l ngpus=1
+#PBS -l walltime=1:00:00
+#PBS -l mem=12GB
+#PBS -l wd
+#PBS -l storage=gdata/ll21
+
+
+./gpu_mem_eval.sh
