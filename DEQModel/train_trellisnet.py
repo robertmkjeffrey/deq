@@ -154,7 +154,7 @@ logging = create_exp_dir(args.work_dir,
 result_log = []
 
 if args.timing:
-    result_log.append(("Epoch", "Total Runtime", "Training Perplexity", "Validation Perplexity",)
+    result_log.append(("Epoch", "Total Runtime", "Training Perplexity", "Validation Perplexity"))
 elif args.force_deq_validation:
     result_log.append(("Epoch", "Total Runtime", "Training Perplexity", "Unrolled Validation Perplexity", "DEQ Validation Perplexity", 
                    "Average Convergence Gap", "Maximum Convergence Gap", "Average Absolute Convergence Gap", "Maximum Absolute Convergence Gap"))
@@ -273,8 +273,8 @@ def evaluate(eval_iter):
                                                                     b_thres=args.b_thres, subseq_len=subseq_len, decode=False)
                 # TODO - optional conversion (diagonal method)
                 loss = criterion(model.decoder.weight, model.decoder.bias, 
-                             output.contiguous().view(-1, output.size(2)), target.view(-1))
-                total_pretrain_loss += loss
+                             pretraining_output.contiguous().view(-1, pretraining_output.size(2)), target.view(-1))
+                total_pretrain_loss += seq_len * loss
 
             # add convergence analytics unless timing. 
             analytics={'convergence_gap':None, "abs_convergence_distance": None, "cg_smoothing": smoothing} if not args.timing else {}
