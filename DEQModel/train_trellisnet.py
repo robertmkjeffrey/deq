@@ -152,7 +152,14 @@ logging = create_exp_dir(args.work_dir,
     scripts_to_save=['train_trellisnet.py', 'models/trellisnets/deq_trellisnet.py'], debug=args.debug)
 
 result_log = []
-result_log.append(("Epoch", "Total Runtime", "Training Perplexity", "Validation Perplexity", "Average Convergence Gap", "Maximum Convergence Gap", 
+
+if args.timing:
+    result_log.append(("Epoch", "Total Runtime", "Training Perplexity", "Validation Perplexity",)
+elif args.force_deq_validation:
+    result_log.append(("Epoch", "Total Runtime", "Training Perplexity", "Unrolled Validation Perplexity", "DEQ Validation Perplexity", 
+                   "Average Convergence Gap", "Maximum Convergence Gap", "Average Absolute Convergence Gap", "Maximum Absolute Convergence Gap"))
+else:
+    result_log.append(("Epoch", "Total Runtime", "Training Perplexity", "Validation Perplexity", "Average Convergence Gap", "Maximum Convergence Gap", 
                                         "Average Absolute Convergence Gap", "Maximum Absolute Convergence Gap"))
 
 # Set visable GPUs
@@ -244,7 +251,7 @@ logging(f'#params = {args.n_all_param}')
 ###############################################################################
 
 pretraining_end = False
-smoothing = 0.0001
+smoothing = 0.001
 
 def evaluate(eval_iter):
     global train_step, pretraining_end
@@ -252,6 +259,7 @@ def evaluate(eval_iter):
     subseq_len = args.subseq_len 
     
     # Evaluation
+    total_pretrain_loss = 0.
     total_len, total_loss, total_convergence_gap, max_convergence_gap, conversion_change, total_abs_cg, max_abs_cg = 0, 0., 0., 0., 0., 0., 0.
     with torch.no_grad():
         mems = []
@@ -259,17 +267,21 @@ def evaluate(eval_iter):
             if mems:
                 mems[0] = mems[0].detach() 
 
-            if (args.force_deq_validation or pretraining_end) and not args.timing:
+            if args.force_deq_validation and not args.timing:
                 # Get the pretraining output for later comparison
                 (_, _, pretraining_output), _ = model(data, target, mems, train_step=args.start_train_steps, f_thres=args.f_thres,
                                                                     b_thres=args.b_thres, subseq_len=subseq_len, decode=False)
                 # TODO - optional conversion (diagonal method)
-            
+                loss = criterion(model.decoder.weight, model.decoder.bias, 
+                             output.contiguous().view(-1, output.size(2)), target.view(-1))
+                total_pretrain_loss += loss
+
             # add convergence analytics unless timing. 
             analytics={'convergence_gap':None, "abs_convergence_distance": None, "cg_smoothing": smoothing} if not args.timing else {}
             
             # output has dimension (seq_len x bsz x nout)
             logging_step = args.pretrain_steps if args.force_deq_validation else train_step # If we've forget DEQ logging, set the step to after pretraining.
+            
             (_, _, output), _ = model(data, target, mems, train_step=train_step, f_thres=args.f_thres, 
                                          b_thres=args.b_thres, subseq_len=subseq_len, decode=False, analytics=analytics) 
             
@@ -284,21 +296,21 @@ def evaluate(eval_iter):
                 total_abs_cg += float(analytics['abs_convergence_distance'])
                 max_abs_cg = max(max_abs_cg, float(analytics['abs_convergence_distance']))
 
-            if (args.force_deq_validation or pretraining_end) and not args.timing:
+            if args.force_deq_validation and not args.timing:
                 conversion_change += float((torch.norm(output - pretraining_output)+smoothing) / (torch.norm(pretraining_output)+smoothing))
 
     # once we've converted the model, clear the flag/
-    if pretraining_end and not args.timing:
-        conversion_change /= total_len
+    if pretraining_end:
         pretraining_end = False
         logging("!! Converted Model !!")
-    elif args.force_deq_validation:
+    
+    if args.force_deq_validation and not args.timing:
         conversion_change /= total_len
     else:
         conversion_change = None
 
     model.train()
-    return total_loss / total_len, (total_convergence_gap/total_len, max_convergence_gap, total_abs_cg/total_len, max_abs_cg, conversion_change)
+    return total_loss / total_len, (total_pretrain_loss / total_len, total_convergence_gap/total_len, max_convergence_gap, total_abs_cg/total_len, max_abs_cg, conversion_change)
 
 
 def train():
@@ -433,7 +445,7 @@ try:
             if time.process_time() - start_time >= args.time_limit:
                 break
         train_loss = train()
-        val_loss, (val_av_cg, val_max_cg, val_abs_av_cg, val_abs_max_cg, conversion_change) = evaluate(va_iter)
+        val_loss, (pretrain_loss, val_av_cg, val_max_cg, val_abs_av_cg, val_abs_max_cg, conversion_change) = evaluate(va_iter)
         logging('-' * 100)
         total_runtime = time.process_time() - start_time 
         log_str = '| Eval {:3d} at step {:>8d} | time: {:5.2f}s ' \
@@ -447,11 +459,19 @@ try:
             logging(f"| Total time: {total_runtime:.2f} | Average convergence gap: {val_av_cg*100:.2f}% | Max convergence gap: {val_max_cg*100:.2f}%")
             logging(f"| Average absolute convergence gap: {val_abs_av_cg:.2f} | Max absolute convergence gap: {val_abs_max_cg:.2f}")
         
+        if args.force_deq_validation:
+            logging(f"| Pretrain Validation PPL: {math.exp(pretrain_loss):.2f}")
         if conversion_change is not None:
             logging(f"| Unrolling to DEQ conversion change: {conversion_change*100:.2f}%")
         logging('-' * 100)
-        
-        result_log.append((epoch, total_runtime, math.exp(train_loss), math.exp(val_loss), val_av_cg, val_max_cg, val_abs_av_cg, val_abs_max_cg))
+       
+        if args.timing:
+            result_log.append((epoch, total_runtime, math.exp(train_loss), math.exp(val_loss)))
+        elif args.force_deq_validation:
+            result_log.append((epoch, total_runtime, math.exp(train_loss), math.exp(val_loss), math.exp(pretrain_loss), 
+                                val_av_cg, val_max_cg, val_abs_av_cg, val_abs_max_cg))
+        else:
+            result_log.append((epoch, total_runtime, math.exp(train_loss), math.exp(val_loss), val_av_cg, val_max_cg, val_abs_av_cg, val_abs_max_cg))
         
         eval_start_time = time.time()
         eval_count += 1
