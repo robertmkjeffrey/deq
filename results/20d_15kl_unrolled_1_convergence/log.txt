@@ -6,9 +6,9 @@
     - d_embed : 400
     - nhid : 1000
     - nout : 400
-    - epochs : 500
+    - epochs : 67
     - halt_ppl : None
-    - time_limit : 16000.0
+    - time_limit : 125000.0
     - optim : Adam
     - lr : 0.01
     - clip : 0.225
@@ -28,6 +28,7 @@
     - not_tied : False
     - anneal : 10
     - log_interval : 100
+    - force_deq_validation : True
     - when : [-1]
     - ksize : 2
     - dilation : 1
@@ -36,7 +37,7 @@
     - use_gpus : None
     - f_thres : 45
     - b_thres : 45
-    - work_dir : LM-TREdeq-ptb/20d_15kl_unrolled_1_20210515-225401
+    - work_dir : LM-TREdeq-ptb/20d_15kl_unrolled_1_convergence_20210529-205801
     - restart : False
     - restart_dir : 
     - debug : False
@@ -47,447 +48,717 @@
     - eval_mem : False
     - eval : False
     - load : 
-    - name : 20d_15kl_unrolled_1
+    - name : 20d_15kl_unrolled_1_convergence
     - tied : True
     - n_token : 10000
     - n_all_param : 24193603
 ====================================================================================================
 #params = 24193603
 |Static Memory Usage: 252.25MB current, 269.03MB max
-| epoch   1 step      100 |    100 batches | lr 0.01 | ms/batch 560.35 | loss  6.40 | ppl   602.448
-| epoch   1 step      200 |    200 batches | lr 0.01 | ms/batch 557.54 | loss  5.79 | ppl   325.762
-----------------------------------------------------------------------------------------------------
-| Eval   1 at step      265 | time: 153.06s | valid loss  5.37 | valid ppl   215.155
-| Total time: 153.09 | Average convergence gap: 0.02% | Max convergence gap: 2.85%
-----------------------------------------------------------------------------------------------------
-| epoch   2 step      300 |     35 batches | lr 0.01 | ms/batch 621.08 | loss  1.96 | ppl     7.120
-| epoch   2 step      400 |    135 batches | lr 0.01 | ms/batch 557.42 | loss  5.49 | ppl   242.042
-| epoch   2 step      500 |    235 batches | lr 0.01 | ms/batch 557.66 | loss  5.37 | ppl   215.059
-----------------------------------------------------------------------------------------------------
-| Eval   2 at step      530 | time: 154.10s | valid loss  5.12 | valid ppl   168.173
-| Total time: 307.20 | Average convergence gap: 0.02% | Max convergence gap: 2.59%
-----------------------------------------------------------------------------------------------------
-| epoch   3 step      600 |     70 batches | lr 0.01 | ms/batch 623.27 | loss  3.72 | ppl    41.269
-| epoch   3 step      700 |    170 batches | lr 0.01 | ms/batch 557.54 | loss  5.26 | ppl   192.507
-----------------------------------------------------------------------------------------------------
-| Eval   3 at step      795 | time: 154.45s | valid loss  4.96 | valid ppl   142.916
-| Total time: 461.62 | Average convergence gap: 0.02% | Max convergence gap: 2.57%
-----------------------------------------------------------------------------------------------------
-| epoch   4 step      800 |      5 batches | lr 0.01 | ms/batch 624.15 | loss  0.27 | ppl     1.309
-| epoch   4 step      900 |    105 batches | lr 0.01 | ms/batch 557.58 | loss  5.16 | ppl   174.990
-| epoch   4 step     1000 |    205 batches | lr 0.01 | ms/batch 557.99 | loss  5.09 | ppl   161.808
-----------------------------------------------------------------------------------------------------
-| Eval   4 at step     1060 | time: 154.54s | valid loss  4.87 | valid ppl   130.318
-| Total time: 616.13 | Average convergence gap: 0.03% | Max convergence gap: 3.06%
-----------------------------------------------------------------------------------------------------
-| epoch   5 step     1100 |     40 batches | lr 0.01 | ms/batch 625.12 | loss  2.04 | ppl     7.659
-| epoch   5 step     1200 |    140 batches | lr 0.01 | ms/batch 557.51 | loss  5.04 | ppl   154.959
-| epoch   5 step     1300 |    240 batches | lr 0.01 | ms/batch 558.27 | loss  4.98 | ppl   144.816
-----------------------------------------------------------------------------------------------------
-| Eval   5 at step     1325 | time: 154.41s | valid loss  4.81 | valid ppl   122.881
-| Total time: 770.51 | Average convergence gap: 0.03% | Max convergence gap: 4.04%
-----------------------------------------------------------------------------------------------------
-| epoch   6 step     1400 |     75 batches | lr 0.01 | ms/batch 623.61 | loss  3.74 | ppl    42.276
-| epoch   6 step     1500 |    175 batches | lr 0.01 | ms/batch 558.20 | loss  4.96 | ppl   142.641
-----------------------------------------------------------------------------------------------------
-| Eval   6 at step     1590 | time: 154.61s | valid loss  4.77 | valid ppl   117.769
-| Total time: 925.10 | Average convergence gap: 0.03% | Max convergence gap: 4.59%
-----------------------------------------------------------------------------------------------------
-| epoch   7 step     1600 |     10 batches | lr 0.01 | ms/batch 625.44 | loss  0.51 | ppl     1.669
-| epoch   7 step     1700 |    110 batches | lr 0.01 | ms/batch 558.49 | loss  4.92 | ppl   137.582
-| epoch   7 step     1800 |    210 batches | lr 0.01 | ms/batch 558.13 | loss  4.87 | ppl   130.467
-----------------------------------------------------------------------------------------------------
-| Eval   7 at step     1855 | time: 154.64s | valid loss  4.73 | valid ppl   113.561
-| Total time: 1079.71 | Average convergence gap: 0.04% | Max convergence gap: 6.19%
-----------------------------------------------------------------------------------------------------
-| epoch   8 step     1900 |     45 batches | lr 0.01 | ms/batch 624.94 | loss  2.21 | ppl     9.144
-| epoch   8 step     2000 |    145 batches | lr 0.01 | ms/batch 558.43 | loss  4.87 | ppl   130.941
-| epoch   8 step     2100 |    245 batches | lr 0.01 | ms/batch 558.48 | loss  4.83 | ppl   124.686
-----------------------------------------------------------------------------------------------------
-| Eval   8 at step     2120 | time: 154.60s | valid loss  4.71 | valid ppl   111.399
-| Total time: 1234.28 | Average convergence gap: 0.05% | Max convergence gap: 6.18%
-----------------------------------------------------------------------------------------------------
-| epoch   9 step     2200 |     80 batches | lr 0.01 | ms/batch 624.32 | loss  3.88 | ppl    48.365
-| epoch   9 step     2300 |    180 batches | lr 0.01 | ms/batch 557.90 | loss  4.80 | ppl   122.040
-----------------------------------------------------------------------------------------------------
-| Eval   9 at step     2385 | time: 154.44s | valid loss  4.69 | valid ppl   109.356
-| Total time: 1388.69 | Average convergence gap: 0.05% | Max convergence gap: 7.57%
-----------------------------------------------------------------------------------------------------
-| epoch  10 step     2400 |     15 batches | lr 0.01 | ms/batch 623.60 | loss  0.73 | ppl     2.080
-| epoch  10 step     2500 |    115 batches | lr 0.01 | ms/batch 557.57 | loss  4.81 | ppl   122.875
-| epoch  10 step     2600 |    215 batches | lr 0.01 | ms/batch 557.55 | loss  4.74 | ppl   114.451
-----------------------------------------------------------------------------------------------------
-| Eval  10 at step     2650 | time: 154.46s | valid loss  4.67 | valid ppl   106.990
-| Total time: 1543.12 | Average convergence gap: 0.04% | Max convergence gap: 4.58%
-----------------------------------------------------------------------------------------------------
-| epoch  11 step     2700 |     50 batches | lr 0.01 | ms/batch 624.87 | loss  2.40 | ppl    11.007
-| epoch  11 step     2800 |    150 batches | lr 0.01 | ms/batch 558.25 | loss  4.78 | ppl   118.656
-| epoch  11 step     2900 |    250 batches | lr 0.01 | ms/batch 558.23 | loss  4.72 | ppl   112.225
-----------------------------------------------------------------------------------------------------
-| Eval  11 at step     2915 | time: 154.52s | valid loss  4.65 | valid ppl   104.713
-| Total time: 1697.61 | Average convergence gap: 0.07% | Max convergence gap: 10.59%
-----------------------------------------------------------------------------------------------------
-| epoch  12 step     3000 |     85 batches | lr 0.01 | ms/batch 623.75 | loss  4.04 | ppl    56.571
-| epoch  12 step     3100 |    185 batches | lr 0.01 | ms/batch 557.73 | loss  4.72 | ppl   112.254
-----------------------------------------------------------------------------------------------------
-| Eval  12 at step     3180 | time: 154.38s | valid loss  4.65 | valid ppl   104.273
-| Total time: 1851.97 | Average convergence gap: 0.08% | Max convergence gap: 12.58%
-----------------------------------------------------------------------------------------------------
-| epoch  13 step     3200 |     20 batches | lr 0.01 | ms/batch 623.81 | loss  0.96 | ppl     2.610
-| epoch  13 step     3300 |    120 batches | lr 0.01 | ms/batch 558.31 | loss  4.74 | ppl   114.747
-| epoch  13 step     3400 |    220 batches | lr 0.01 | ms/batch 558.43 | loss  4.67 | ppl   106.227
-----------------------------------------------------------------------------------------------------
-| Eval  13 at step     3445 | time: 154.62s | valid loss  4.64 | valid ppl   103.102
-| Total time: 2006.56 | Average convergence gap: 0.07% | Max convergence gap: 9.36%
-----------------------------------------------------------------------------------------------------
-| epoch  14 step     3500 |     55 batches | lr 0.01 | ms/batch 628.75 | loss  2.59 | ppl    13.317
-| epoch  14 step     3600 |    155 batches | lr 0.01 | ms/batch 558.37 | loss  4.71 | ppl   111.189
-| epoch  14 step     3700 |    255 batches | lr 0.01 | ms/batch 558.46 | loss  4.67 | ppl   106.677
-----------------------------------------------------------------------------------------------------
-| Eval  14 at step     3710 | time: 154.89s | valid loss  4.63 | valid ppl   102.039
-| Total time: 2161.05 | Average convergence gap: 0.07% | Max convergence gap: 9.54%
-----------------------------------------------------------------------------------------------------
-| epoch  15 step     3800 |     90 batches | lr 0.01 | ms/batch 623.55 | loss  4.24 | ppl    69.115
-| epoch  15 step     3900 |    190 batches | lr 0.01 | ms/batch 558.59 | loss  4.64 | ppl   103.800
-----------------------------------------------------------------------------------------------------
-| Eval  15 at step     3975 | time: 154.74s | valid loss  4.63 | valid ppl   102.261
-| Total time: 2315.76 | Average convergence gap: 0.06% | Max convergence gap: 7.01%
-----------------------------------------------------------------------------------------------------
-| epoch  16 step     4000 |     25 batches | lr 0.01 | ms/batch 610.62 | loss  1.17 | ppl     3.235
-| epoch  16 step     4100 |    125 batches | lr 0.01 | ms/batch 558.30 | loss  4.70 | ppl   109.841
-| epoch  16 step     4200 |    225 batches | lr 0.01 | ms/batch 557.99 | loss  4.62 | ppl   101.351
-----------------------------------------------------------------------------------------------------
-| Eval  16 at step     4240 | time: 153.04s | valid loss  4.61 | valid ppl   100.498
-| Total time: 2468.83 | Average convergence gap: 0.07% | Max convergence gap: 9.28%
-----------------------------------------------------------------------------------------------------
-| epoch  17 step     4300 |     60 batches | lr 0.01 | ms/batch 624.54 | loss  2.79 | ppl    16.349
-| epoch  17 step     4400 |    160 batches | lr 0.01 | ms/batch 557.88 | loss  4.67 | ppl   106.945
-| epoch  17 step     4500 |    260 batches | lr 0.01 | ms/batch 557.97 | loss  4.62 | ppl   101.925
-----------------------------------------------------------------------------------------------------
-| Eval  17 at step     4505 | time: 154.51s | valid loss  4.60 | valid ppl    99.539
-| Total time: 2623.30 | Average convergence gap: 0.06% | Max convergence gap: 8.11%
-----------------------------------------------------------------------------------------------------
-| epoch  18 step     4600 |     95 batches | lr 0.01 | ms/batch 624.67 | loss  4.43 | ppl    84.158
-| epoch  18 step     4700 |    195 batches | lr 0.01 | ms/batch 557.89 | loss  4.60 | ppl    99.093
-----------------------------------------------------------------------------------------------------
-| Eval  18 at step     4770 | time: 154.52s | valid loss  4.58 | valid ppl    97.252
-| Total time: 2777.79 | Average convergence gap: 0.16% | Max convergence gap: 21.00%
-----------------------------------------------------------------------------------------------------
-| epoch  19 step     4800 |     30 batches | lr 0.01 | ms/batch 624.21 | loss  1.40 | ppl     4.055
-| epoch  19 step     4900 |    130 batches | lr 0.01 | ms/batch 557.89 | loss  4.64 | ppl   103.825
-| epoch  19 step     5000 |    230 batches | lr 0.01 | ms/batch 558.16 | loss  4.59 | ppl    98.384
-----------------------------------------------------------------------------------------------------
-| Eval  19 at step     5035 | time: 154.61s | valid loss  4.58 | valid ppl    97.790
-| Total time: 2932.37 | Average convergence gap: 0.09% | Max convergence gap: 12.82%
-----------------------------------------------------------------------------------------------------
-| epoch  20 step     5100 |     65 batches | lr 0.01 | ms/batch 610.23 | loss  3.01 | ppl    20.292
-| epoch  20 step     5200 |    165 batches | lr 0.01 | ms/batch 557.70 | loss  4.64 | ppl   103.808
-| epoch  20 step     5300 |    265 batches | lr 0.01 | ms/batch 553.21 | loss  4.58 | ppl    97.746
-----------------------------------------------------------------------------------------------------
-| Eval  20 at step     5300 | time: 152.83s | valid loss  4.59 | valid ppl    98.187
-| Total time: 3085.22 | Average convergence gap: 0.09% | Max convergence gap: 13.11%
-----------------------------------------------------------------------------------------------------
-| epoch  21 step     5400 |    100 batches | lr 0.01 | ms/batch 612.53 | loss  4.63 | ppl   102.817
-| epoch  21 step     5500 |    200 batches | lr 0.01 | ms/batch 557.62 | loss  4.58 | ppl    97.040
-----------------------------------------------------------------------------------------------------
-| Eval  21 at step     5565 | time: 152.89s | valid loss  4.57 | valid ppl    96.155
-| Total time: 3238.15 | Average convergence gap: 0.09% | Max convergence gap: 13.13%
-----------------------------------------------------------------------------------------------------
-| epoch  22 step     5600 |     35 batches | lr 0.01 | ms/batch 624.04 | loss  1.62 | ppl     5.060
-| epoch  22 step     5700 |    135 batches | lr 0.01 | ms/batch 557.73 | loss  4.62 | ppl   101.503
-| epoch  22 step     5800 |    235 batches | lr 0.01 | ms/batch 557.96 | loss  4.56 | ppl    95.782
-----------------------------------------------------------------------------------------------------
-| Eval  22 at step     5830 | time: 154.39s | valid loss  4.57 | valid ppl    96.200
-| Total time: 3392.51 | Average convergence gap: 0.09% | Max convergence gap: 12.78%
-----------------------------------------------------------------------------------------------------
-| epoch  23 step     5900 |     70 batches | lr 0.01 | ms/batch 608.21 | loss  3.22 | ppl    25.102
-| epoch  23 step     6000 |    170 batches | lr 0.01 | ms/batch 558.04 | loss  4.62 | ppl   101.038
-----------------------------------------------------------------------------------------------------
-| Eval  23 at step     6095 | time: 152.92s | valid loss  4.58 | valid ppl    97.070
-| Total time: 3545.46 | Average convergence gap: 0.06% | Max convergence gap: 7.72%
-----------------------------------------------------------------------------------------------------
-| epoch  24 step     6100 |      5 batches | lr 0.01 | ms/batch 608.42 | loss  0.24 | ppl     1.275
-| epoch  24 step     6200 |    105 batches | lr 0.01 | ms/batch 558.13 | loss  4.60 | ppl    99.892
-| epoch  24 step     6300 |    205 batches | lr 0.01 | ms/batch 558.03 | loss  4.55 | ppl    94.404
-----------------------------------------------------------------------------------------------------
-| Eval  24 at step     6360 | time: 152.83s | valid loss  4.59 | valid ppl    98.412
-| Total time: 3698.33 | Average convergence gap: 0.05% | Max convergence gap: 5.89%
-----------------------------------------------------------------------------------------------------
-| epoch  25 step     6400 |     40 batches | lr 0.01 | ms/batch 607.03 | loss  1.85 | ppl     6.374
-| epoch  25 step     6500 |    140 batches | lr 0.01 | ms/batch 556.64 | loss  4.58 | ppl    97.864
-| epoch  25 step     6600 |    240 batches | lr 0.01 | ms/batch 556.49 | loss  4.54 | ppl    94.158
-----------------------------------------------------------------------------------------------------
-| Eval  25 at step     6625 | time: 152.51s | valid loss  4.57 | valid ppl    96.119
-| Total time: 3850.90 | Average convergence gap: 0.06% | Max convergence gap: 7.14%
-----------------------------------------------------------------------------------------------------
-| epoch  26 step     6700 |     75 batches | lr 0.01 | ms/batch 622.43 | loss  3.44 | ppl    31.259
-| epoch  26 step     6800 |    175 batches | lr 0.01 | ms/batch 557.03 | loss  4.57 | ppl    96.795
-----------------------------------------------------------------------------------------------------
-| Eval  26 at step     6890 | time: 154.42s | valid loss  4.55 | valid ppl    94.203
-| Total time: 4005.30 | Average convergence gap: 0.08% | Max convergence gap: 12.34%
-----------------------------------------------------------------------------------------------------
-| epoch  27 step     6900 |     10 batches | lr 0.01 | ms/batch 625.29 | loss  0.47 | ppl     1.603
-| epoch  27 step     7000 |    110 batches | lr 0.01 | ms/batch 557.49 | loss  4.58 | ppl    97.156
-| epoch  27 step     7100 |    210 batches | lr 0.01 | ms/batch 557.58 | loss  4.53 | ppl    92.433
-----------------------------------------------------------------------------------------------------
-| Eval  27 at step     7155 | time: 154.33s | valid loss  4.57 | valid ppl    96.778
-| Total time: 4159.59 | Average convergence gap: 0.06% | Max convergence gap: 7.94%
-----------------------------------------------------------------------------------------------------
-| epoch  28 step     7200 |     45 batches | lr 0.01 | ms/batch 607.66 | loss  2.06 | ppl     7.852
-| epoch  28 step     7300 |    145 batches | lr 0.01 | ms/batch 557.60 | loss  4.56 | ppl    95.233
-| epoch  28 step     7400 |    245 batches | lr 0.01 | ms/batch 557.44 | loss  4.53 | ppl    93.176
-----------------------------------------------------------------------------------------------------
-| Eval  28 at step     7420 | time: 152.80s | valid loss  4.54 | valid ppl    93.478
-| Total time: 4312.42 | Average convergence gap: 0.07% | Max convergence gap: 8.35%
-----------------------------------------------------------------------------------------------------
-| epoch  29 step     7500 |     80 batches | lr 0.01 | ms/batch 623.99 | loss  3.66 | ppl    38.953
-| epoch  29 step     7600 |    180 batches | lr 0.01 | ms/batch 557.82 | loss  4.56 | ppl    95.567
-----------------------------------------------------------------------------------------------------
-| Eval  29 at step     7685 | time: 154.53s | valid loss  4.54 | valid ppl    93.987
-| Total time: 4466.91 | Average convergence gap: 0.08% | Max convergence gap: 9.97%
-----------------------------------------------------------------------------------------------------
-| epoch  30 step     7700 |     15 batches | lr 0.01 | ms/batch 609.19 | loss  0.70 | ppl     2.005
-| epoch  30 step     7800 |    115 batches | lr 0.01 | ms/batch 557.88 | loss  4.56 | ppl    95.674
-| epoch  30 step     7900 |    215 batches | lr 0.01 | ms/batch 557.68 | loss  4.51 | ppl    90.848
-----------------------------------------------------------------------------------------------------
-| Eval  30 at step     7950 | time: 152.95s | valid loss  4.53 | valid ppl    92.721
-| Total time: 4619.90 | Average convergence gap: 0.08% | Max convergence gap: 10.90%
-----------------------------------------------------------------------------------------------------
-| epoch  31 step     8000 |     50 batches | lr 0.01 | ms/batch 624.75 | loss  2.28 | ppl     9.788
-| epoch  31 step     8100 |    150 batches | lr 0.01 | ms/batch 557.88 | loss  4.55 | ppl    94.691
-| epoch  31 step     8200 |    250 batches | lr 0.01 | ms/batch 557.75 | loss  4.51 | ppl    90.726
-----------------------------------------------------------------------------------------------------
-| Eval  31 at step     8215 | time: 154.51s | valid loss  4.53 | valid ppl    92.553
-| Total time: 4774.37 | Average convergence gap: 0.07% | Max convergence gap: 8.16%
-----------------------------------------------------------------------------------------------------
-| epoch  32 step     8300 |     85 batches | lr 0.01 | ms/batch 624.76 | loss  3.88 | ppl    48.406
-| epoch  32 step     8400 |    185 batches | lr 0.01 | ms/batch 558.04 | loss  4.52 | ppl    91.990
-----------------------------------------------------------------------------------------------------
-| Eval  32 at step     8480 | time: 154.49s | valid loss  4.53 | valid ppl    92.296
-| Total time: 4928.83 | Average convergence gap: 0.06% | Max convergence gap: 6.88%
-----------------------------------------------------------------------------------------------------
-| epoch  33 step     8500 |     20 batches | lr 0.01 | ms/batch 624.13 | loss  0.92 | ppl     2.508
-| epoch  33 step     8600 |    120 batches | lr 0.01 | ms/batch 558.13 | loss  4.56 | ppl    95.962
-| epoch  33 step     8700 |    220 batches | lr 0.01 | ms/batch 557.66 | loss  4.48 | ppl    88.406
-----------------------------------------------------------------------------------------------------
-| Eval  33 at step     8745 | time: 154.46s | valid loss  4.52 | valid ppl    91.970
-| Total time: 5083.25 | Average convergence gap: 0.06% | Max convergence gap: 6.83%
-----------------------------------------------------------------------------------------------------
-| epoch  34 step     8800 |     55 batches | lr 0.01 | ms/batch 624.03 | loss  2.51 | ppl    12.245
-| epoch  34 step     8900 |    155 batches | lr 0.01 | ms/batch 557.99 | loss  4.55 | ppl    94.776
-| epoch  34 step     9000 |    255 batches | lr 0.01 | ms/batch 557.68 | loss  4.50 | ppl    90.446
-----------------------------------------------------------------------------------------------------
-| Eval  34 at step     9010 | time: 154.38s | valid loss  4.52 | valid ppl    91.756
-| Total time: 5237.59 | Average convergence gap: 0.06% | Max convergence gap: 6.91%
-----------------------------------------------------------------------------------------------------
-| epoch  35 step     9100 |     90 batches | lr 0.01 | ms/batch 623.11 | loss  4.10 | ppl    60.573
-| epoch  35 step     9200 |    190 batches | lr 0.01 | ms/batch 557.75 | loss  4.50 | ppl    89.970
-----------------------------------------------------------------------------------------------------
-| Eval  35 at step     9275 | time: 154.48s | valid loss  4.53 | valid ppl    93.191
-| Total time: 5392.03 | Average convergence gap: 0.04% | Max convergence gap: 5.05%
-----------------------------------------------------------------------------------------------------
-| epoch  36 step     9300 |     25 batches | lr 0.01 | ms/batch 609.24 | loss  1.14 | ppl     3.126
-| epoch  36 step     9400 |    125 batches | lr 0.01 | ms/batch 557.78 | loss  4.54 | ppl    93.931
-| epoch  36 step     9500 |    225 batches | lr 0.01 | ms/batch 557.97 | loss  4.46 | ppl    86.867
-----------------------------------------------------------------------------------------------------
-| Eval  36 at step     9540 | time: 152.99s | valid loss  4.52 | valid ppl    91.826
-| Total time: 5545.05 | Average convergence gap: 0.04% | Max convergence gap: 5.39%
-----------------------------------------------------------------------------------------------------
-| epoch  37 step     9600 |     60 batches | lr 0.01 | ms/batch 609.28 | loss  2.71 | ppl    15.066
-| epoch  37 step     9700 |    160 batches | lr 0.01 | ms/batch 557.82 | loss  4.54 | ppl    93.976
-| epoch  37 step     9800 |    260 batches | lr 0.01 | ms/batch 557.61 | loss  4.50 | ppl    89.843
-----------------------------------------------------------------------------------------------------
-| Eval  37 at step     9805 | time: 152.82s | valid loss  4.51 | valid ppl    91.078
-| Total time: 5697.90 | Average convergence gap: 0.05% | Max convergence gap: 5.90%
-----------------------------------------------------------------------------------------------------
-| epoch  38 step     9900 |     95 batches | lr 0.01 | ms/batch 622.96 | loss  4.31 | ppl    74.747
-| epoch  38 step    10000 |    195 batches | lr 0.01 | ms/batch 556.54 | loss  4.47 | ppl    87.763
-----------------------------------------------------------------------------------------------------
-| Eval  38 at step    10070 | time: 154.10s | valid loss  4.51 | valid ppl    90.558
-| Total time: 5851.98 | Average convergence gap: 0.05% | Max convergence gap: 6.08%
-----------------------------------------------------------------------------------------------------
-| epoch  39 step    10100 |     30 batches | lr 0.01 | ms/batch 622.17 | loss  1.37 | ppl     3.928
-| epoch  39 step    10200 |    130 batches | lr 0.01 | ms/batch 556.47 | loss  4.53 | ppl    92.945
-| epoch  39 step    10300 |    230 batches | lr 0.01 | ms/batch 556.61 | loss  4.46 | ppl    86.419
-----------------------------------------------------------------------------------------------------
-| Eval  39 at step    10335 | time: 154.06s | valid loss  4.50 | valid ppl    89.820
-| Total time: 6006.03 | Average convergence gap: 0.06% | Max convergence gap: 7.69%
-----------------------------------------------------------------------------------------------------
-| epoch  40 step    10400 |     65 batches | lr 0.01 | ms/batch 622.27 | loss  2.93 | ppl    18.810
-| epoch  40 step    10500 |    165 batches | lr 0.01 | ms/batch 556.63 | loss  4.52 | ppl    91.667
-| epoch  40 step    10600 |    265 batches | lr 0.01 | ms/batch 551.83 | loss  4.47 | ppl    87.250
-----------------------------------------------------------------------------------------------------
-| Eval  40 at step    10600 | time: 154.06s | valid loss  4.50 | valid ppl    90.288
-| Total time: 6160.08 | Average convergence gap: 0.07% | Max convergence gap: 8.35%
-----------------------------------------------------------------------------------------------------
-| epoch  41 step    10700 |    100 batches | lr 0.01 | ms/batch 611.11 | loss  4.53 | ppl    92.837
-| epoch  41 step    10800 |    200 batches | lr 0.01 | ms/batch 556.67 | loss  4.47 | ppl    87.377
-----------------------------------------------------------------------------------------------------
-| Eval  41 at step    10865 | time: 152.53s | valid loss  4.51 | valid ppl    90.982
-| Total time: 6312.67 | Average convergence gap: 0.06% | Max convergence gap: 7.43%
-----------------------------------------------------------------------------------------------------
-| epoch  42 step    10900 |     35 batches | lr 0.01 | ms/batch 606.96 | loss  1.58 | ppl     4.858
-| epoch  42 step    11000 |    135 batches | lr 0.01 | ms/batch 556.36 | loss  4.51 | ppl    91.351
-| epoch  42 step    11100 |    235 batches | lr 0.01 | ms/batch 556.43 | loss  4.48 | ppl    87.940
-----------------------------------------------------------------------------------------------------
-| Eval  42 at step    11130 | time: 152.47s | valid loss  4.50 | valid ppl    90.166
-| Total time: 6465.20 | Average convergence gap: 0.06% | Max convergence gap: 7.53%
-----------------------------------------------------------------------------------------------------
-| epoch  43 step    11200 |     70 batches | lr 0.01 | ms/batch 606.68 | loss  3.16 | ppl    23.527
-| epoch  43 step    11300 |    170 batches | lr 0.01 | ms/batch 556.60 | loss  4.53 | ppl    92.387
-----------------------------------------------------------------------------------------------------
-| Eval  43 at step    11395 | time: 152.47s | valid loss  4.51 | valid ppl    90.523
-| Total time: 6617.73 | Average convergence gap: 0.06% | Max convergence gap: 6.86%
-----------------------------------------------------------------------------------------------------
-| epoch  44 step    11400 |      5 batches | lr 0.01 | ms/batch 606.38 | loss  0.24 | ppl     1.267
-| epoch  44 step    11500 |    105 batches | lr 0.01 | ms/batch 556.47 | loss  4.52 | ppl    91.442
-| epoch  44 step    11600 |    205 batches | lr 0.01 | ms/batch 557.01 | loss  4.47 | ppl    87.082
-----------------------------------------------------------------------------------------------------
-| Eval  44 at step    11660 | time: 152.56s | valid loss  4.51 | valid ppl    90.586
-| Total time: 6770.35 | Average convergence gap: 0.06% | Max convergence gap: 6.78%
-----------------------------------------------------------------------------------------------------
-| epoch  45 step    11700 |     40 batches | lr 0.01 | ms/batch 607.31 | loss  1.82 | ppl     6.159
-| epoch  45 step    11800 |    140 batches | lr 0.01 | ms/batch 557.27 | loss  4.51 | ppl    90.880
-| epoch  45 step    11900 |    240 batches | lr 0.01 | ms/batch 556.97 | loss  4.45 | ppl    85.411
-----------------------------------------------------------------------------------------------------
-| Eval  45 at step    11925 | time: 152.66s | valid loss  4.50 | valid ppl    90.244
-| Total time: 6923.07 | Average convergence gap: 0.05% | Max convergence gap: 6.46%
-----------------------------------------------------------------------------------------------------
-| epoch  46 step    12000 |     75 batches | lr 0.01 | ms/batch 607.26 | loss  3.38 | ppl    29.349
-| epoch  46 step    12100 |    175 batches | lr 0.01 | ms/batch 557.25 | loss  4.51 | ppl    90.514
-----------------------------------------------------------------------------------------------------
-| Eval  46 at step    12190 | time: 152.72s | valid loss  4.50 | valid ppl    90.094
-| Total time: 7075.85 | Average convergence gap: 0.06% | Max convergence gap: 7.57%
-----------------------------------------------------------------------------------------------------
-| epoch  47 step    12200 |     10 batches | lr 0.01 | ms/batch 607.76 | loss  0.47 | ppl     1.594
-| epoch  47 step    12300 |    110 batches | lr 0.01 | ms/batch 557.32 | loss  4.50 | ppl    89.715
-| epoch  47 step    12400 |    210 batches | lr 0.01 | ms/batch 556.52 | loss  4.46 | ppl    86.269
-----------------------------------------------------------------------------------------------------
-| Eval  47 at step    12455 | time: 152.63s | valid loss  4.50 | valid ppl    90.069
-| Total time: 7228.54 | Average convergence gap: 0.05% | Max convergence gap: 5.84%
-----------------------------------------------------------------------------------------------------
-| epoch  48 step    12500 |     45 batches | lr 0.01 | ms/batch 607.33 | loss  2.03 | ppl     7.588
-| epoch  48 step    12600 |    145 batches | lr 0.01 | ms/batch 556.84 | loss  4.51 | ppl    90.643
-| epoch  48 step    12700 |    245 batches | lr 0.01 | ms/batch 556.84 | loss  4.46 | ppl    86.235
-----------------------------------------------------------------------------------------------------
-| Eval  48 at step    12720 | time: 152.59s | valid loss  4.50 | valid ppl    90.268
-| Total time: 7381.19 | Average convergence gap: 0.04% | Max convergence gap: 5.39%
-----------------------------------------------------------------------------------------------------
-| epoch  49 step    12800 |     80 batches | lr 0.01 | ms/batch 606.92 | loss  3.60 | ppl    36.671
-| epoch  49 step    12900 |    180 batches | lr 0.01 | ms/batch 557.16 | loss  4.48 | ppl    87.933
-----------------------------------------------------------------------------------------------------
-| Eval  49 at step    12985 | time: 152.60s | valid loss  4.49 | valid ppl    88.766
-| Total time: 7533.85 | Average convergence gap: 0.04% | Max convergence gap: 5.44%
-----------------------------------------------------------------------------------------------------
-| epoch  50 step    13000 |     15 batches | lr 0.01 | ms/batch 623.11 | loss  0.69 | ppl     1.987
-| epoch  50 step    13100 |    115 batches | lr 0.01 | ms/batch 556.77 | loss  4.49 | ppl    89.407
-| epoch  50 step    13200 |    215 batches | lr 0.01 | ms/batch 557.20 | loss  4.44 | ppl    85.011
-----------------------------------------------------------------------------------------------------
-| Eval  50 at step    13250 | time: 154.26s | valid loss  4.48 | valid ppl    88.442
-| Total time: 7688.09 | Average convergence gap: 0.06% | Max convergence gap: 7.47%
-----------------------------------------------------------------------------------------------------
-| epoch  51 step    13300 |     50 batches | lr 0.01 | ms/batch 623.63 | loss  2.25 | ppl     9.523
-| epoch  51 step    13400 |    150 batches | lr 0.01 | ms/batch 557.31 | loss  4.49 | ppl    89.501
-| epoch  51 step    13500 |    250 batches | lr 0.01 | ms/batch 557.18 | loss  4.44 | ppl    84.601
-----------------------------------------------------------------------------------------------------
-| Eval  51 at step    13515 | time: 154.27s | valid loss  4.49 | valid ppl    88.905
-| Total time: 7842.36 | Average convergence gap: 0.08% | Max convergence gap: 10.26%
-----------------------------------------------------------------------------------------------------
-| epoch  52 step    13600 |     85 batches | lr 0.01 | ms/batch 607.25 | loss  3.83 | ppl    45.930
-| epoch  52 step    13700 |    185 batches | lr 0.01 | ms/batch 557.22 | loss  4.47 | ppl    87.224
-----------------------------------------------------------------------------------------------------
-| Eval  52 at step    13780 | time: 152.67s | valid loss  4.48 | valid ppl    88.182
-| Total time: 7995.08 | Average convergence gap: 0.07% | Max convergence gap: 8.89%
-----------------------------------------------------------------------------------------------------
-| epoch  53 step    13800 |     20 batches | lr 0.01 | ms/batch 623.39 | loss  0.91 | ppl     2.487
-| epoch  53 step    13900 |    120 batches | lr 0.01 | ms/batch 557.46 | loss  4.50 | ppl    89.833
-| epoch  53 step    14000 |    220 batches | lr 0.01 | ms/batch 557.44 | loss  4.43 | ppl    84.244
-----------------------------------------------------------------------------------------------------
-| Eval  53 at step    14045 | time: 154.40s | valid loss  4.48 | valid ppl    87.819
-| Total time: 8149.47 | Average convergence gap: 0.06% | Max convergence gap: 7.67%
-----------------------------------------------------------------------------------------------------
-| epoch  54 step    14100 |     55 batches | lr 0.01 | ms/batch 624.12 | loss  2.46 | ppl    11.719
-| epoch  54 step    14200 |    155 batches | lr 0.01 | ms/batch 557.14 | loss  4.49 | ppl    89.313
-| epoch  54 step    14300 |    255 batches | lr 0.01 | ms/batch 557.31 | loss  4.44 | ppl    84.667
-----------------------------------------------------------------------------------------------------
-| Eval  54 at step    14310 | time: 154.34s | valid loss  4.48 | valid ppl    88.427
-| Total time: 8303.80 | Average convergence gap: 0.04% | Max convergence gap: 5.44%
-----------------------------------------------------------------------------------------------------
-| epoch  55 step    14400 |     90 batches | lr 0.01 | ms/batch 607.76 | loss  4.04 | ppl    56.999
-| epoch  55 step    14500 |    190 batches | lr 0.01 | ms/batch 557.22 | loss  4.45 | ppl    85.563
-----------------------------------------------------------------------------------------------------
-| Eval  55 at step    14575 | time: 152.71s | valid loss  4.49 | valid ppl    88.844
-| Total time: 8456.58 | Average convergence gap: 0.05% | Max convergence gap: 6.07%
-----------------------------------------------------------------------------------------------------
-| epoch  56 step    14600 |     25 batches | lr 0.01 | ms/batch 607.78 | loss  1.13 | ppl     3.083
-| epoch  56 step    14700 |    125 batches | lr 0.01 | ms/batch 557.41 | loss  4.49 | ppl    88.977
-| epoch  56 step    14800 |    225 batches | lr 0.01 | ms/batch 557.53 | loss  4.42 | ppl    82.911
-----------------------------------------------------------------------------------------------------
-| Eval  56 at step    14840 | time: 152.76s | valid loss  4.49 | valid ppl    88.998
-| Total time: 8609.39 | Average convergence gap: 0.04% | Max convergence gap: 5.20%
-----------------------------------------------------------------------------------------------------
-| epoch  57 step    14900 |     60 batches | lr 0.01 | ms/batch 607.67 | loss  2.67 | ppl    14.507
-| epoch  57 step    15000 |    160 batches | lr 0.01 | ms/batch 557.47 | loss  4.50 | ppl    89.669
-| epoch  57 step    15100 |    260 batches | lr 0.01 | ms/batch 3028.51 | loss  4.42 | ppl    83.304
-----------------------------------------------------------------------------------------------------
-| Eval  57 at step    15105 | time: 486.40s | valid loss  4.47 | valid ppl    87.354
-| Total time: 9095.94 | Average convergence gap: 0.04% | Max convergence gap: 5.38%
-| Conversion complete, average change: 0.19%
-----------------------------------------------------------------------------------------------------
-| epoch  58 step    15200 |     95 batches | lr 0.01 | ms/batch 3834.99 | loss  4.25 | ppl    70.119
-| epoch  58 step    15300 |    195 batches | lr 0.01 | ms/batch 3026.20 | loss  4.42 | ppl    83.437
-----------------------------------------------------------------------------------------------------
-| Eval  58 at step    15370 | time: 877.65s | valid loss  4.47 | valid ppl    87.299
-| Total time: 9973.86 | Average convergence gap: 0.05% | Max convergence gap: 7.53%
-----------------------------------------------------------------------------------------------------
-| epoch  59 step    15400 |     30 batches | lr 0.01 | ms/batch 3782.96 | loss  1.35 | ppl     3.847
-| epoch  59 step    15500 |    130 batches | lr 0.01 | ms/batch 3026.57 | loss  4.48 | ppl    88.423
-| epoch  59 step    15600 |    230 batches | lr 0.01 | ms/batch 3022.86 | loss  4.62 | ppl   101.059
-----------------------------------------------------------------------------------------------------
-| Eval  59 at step    15635 | time: 877.33s | valid loss  4.48 | valid ppl    88.244
-| Total time: 10851.46 | Average convergence gap: 0.06% | Max convergence gap: 9.87%
-----------------------------------------------------------------------------------------------------
-| epoch  60 step    15700 |     65 batches | lr 0.01 | ms/batch 3764.50 | loss  2.92 | ppl    18.511
-| epoch  60 step    15800 |    165 batches | lr 0.01 | ms/batch 3023.34 | loss  4.49 | ppl    89.251
-| epoch  60 step    15900 |    265 batches | lr 0.01 | ms/batch 2992.04 | loss  4.63 | ppl   102.020
-----------------------------------------------------------------------------------------------------
-| Eval  60 at step    15900 | time: 874.89s | valid loss  4.48 | valid ppl    88.212
-| Total time: 11726.69 | Average convergence gap: 0.07% | Max convergence gap: 11.49%
-----------------------------------------------------------------------------------------------------
-| epoch  61 step    16000 |    100 batches | lr 0.01 | ms/batch 3789.85 | loss  4.57 | ppl    96.258
-| epoch  61 step    16100 |    200 batches | lr 0.01 | ms/batch 3017.40 | loss  4.80 | ppl   122.039
-----------------------------------------------------------------------------------------------------
-| Eval  61 at step    16165 | time: 873.90s | valid loss  4.58 | valid ppl    97.476
-| Total time: 12600.93 | Average convergence gap: 0.10% | Max convergence gap: 49.10%
-----------------------------------------------------------------------------------------------------
-| epoch  62 step    16200 |     35 batches | lr 0.001 | ms/batch 3755.64 | loss  1.74 | ppl     5.710
-| epoch  62 step    16300 |    135 batches | lr 0.001 | ms/batch 3017.33 | loss  4.73 | ppl   113.701
-| epoch  62 step    16400 |    235 batches | lr 0.001 | ms/batch 3018.40 | loss  4.49 | ppl    88.901
-----------------------------------------------------------------------------------------------------
-| Eval  62 at step    16430 | time: 873.57s | valid loss  4.50 | valid ppl    89.973
-| Total time: 13474.85 | Average convergence gap: 0.10% | Max convergence gap: 34.10%
-----------------------------------------------------------------------------------------------------
-| epoch  63 step    16500 |     70 batches | lr 0.0001 | ms/batch 3758.58 | loss  3.17 | ppl    23.694
-| epoch  63 step    16600 |    170 batches | lr 0.0001 | ms/batch 3020.06 | loss  4.45 | ppl    86.021
-----------------------------------------------------------------------------------------------------
-| Eval  63 at step    16695 | time: 874.27s | valid loss  4.54 | valid ppl    93.743
-| Total time: 14349.47 | Average convergence gap: 0.14% | Max convergence gap: 57.15%
-----------------------------------------------------------------------------------------------------
-| epoch  64 step    16700 |      5 batches | lr 1e-05 | ms/batch 3759.74 | loss  0.23 | ppl     1.265
-| epoch  64 step    16800 |    105 batches | lr 1e-05 | ms/batch 3018.82 | loss  4.48 | ppl    88.213
-| epoch  64 step    16900 |    205 batches | lr 1e-05 | ms/batch 3019.02 | loss  4.38 | ppl    79.494
-----------------------------------------------------------------------------------------------------
-| Eval  64 at step    16960 | time: 873.96s | valid loss  4.57 | valid ppl    96.395
-| Total time: 15223.78 | Average convergence gap: 0.14% | Max convergence gap: 62.04%
-----------------------------------------------------------------------------------------------------
-| epoch  65 step    17000 |     40 batches | lr 1e-05 | ms/batch 3758.65 | loss  1.81 | ppl     6.141
-| epoch  65 step    17100 |    140 batches | lr 1e-05 | ms/batch 3019.47 | loss  4.45 | ppl    85.758
-| epoch  65 step    17200 |    240 batches | lr 1e-05 | ms/batch 3019.41 | loss  4.34 | ppl    77.085
-----------------------------------------------------------------------------------------------------
-| Eval  65 at step    17225 | time: 874.21s | valid loss  4.65 | valid ppl   104.629
-| Total time: 16098.33 | Average convergence gap: 0.14% | Max convergence gap: 67.13%
+| epoch   1 step      100 |    100 batches | lr 0.01 | ms/batch 566.46 | loss  6.40 | ppl   602.448
+| epoch   1 step      200 |    200 batches | lr 0.01 | ms/batch 555.54 | loss  5.79 | ppl   325.762
+| train loss: 5.99 | train ppl 399.523
+----------------------------------------------------------------------------------------------------
+| Eval   1 at step      265 | time: 158.55s | valid loss  5.37 | valid ppl   215.155
+| Total time: 157.92 | Average convergence gap: 0.02% | Max convergence gap: 2.85%
+| Average absolute convergence gap: 0.65 | Max absolute convergence gap: 76.56
+| Pretrain Validation PPL: 215.15
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch   2 step      300 |     35 batches | lr 0.01 | ms/batch 671.59 | loss  1.96 | ppl     7.125
+| epoch   2 step      400 |    135 batches | lr 0.01 | ms/batch 555.78 | loss  5.49 | ppl   242.494
+| epoch   2 step      500 |    235 batches | lr 0.01 | ms/batch 555.80 | loss  5.36 | ppl   212.563
+| train loss: 5.45 | train ppl 232.498
+----------------------------------------------------------------------------------------------------
+| Eval   2 at step      530 | time: 158.88s | valid loss  5.12 | valid ppl   166.684
+| Total time: 316.88 | Average convergence gap: 0.02% | Max convergence gap: 2.53%
+| Average absolute convergence gap: 0.32 | Max absolute convergence gap: 38.38
+| Pretrain Validation PPL: 166.68
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch   3 step      600 |     70 batches | lr 0.01 | ms/batch 672.99 | loss  3.72 | ppl    41.254
+| epoch   3 step      700 |    170 batches | lr 0.01 | ms/batch 555.90 | loss  5.26 | ppl   192.907
+| train loss: 5.25 | train ppl 190.602
+----------------------------------------------------------------------------------------------------
+| Eval   3 at step      795 | time: 159.02s | valid loss  4.97 | valid ppl   143.987
+| Total time: 475.94 | Average convergence gap: 0.02% | Max convergence gap: 2.89%
+| Average absolute convergence gap: 0.21 | Max absolute convergence gap: 24.88
+| Pretrain Validation PPL: 143.99
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch   4 step      800 |      5 batches | lr 0.01 | ms/batch 672.96 | loss  0.27 | ppl     1.308
+| epoch   4 step      900 |    105 batches | lr 0.01 | ms/batch 555.68 | loss  5.15 | ppl   172.175
+| epoch   4 step     1000 |    205 batches | lr 0.01 | ms/batch 555.74 | loss  5.08 | ppl   161.021
+| train loss: 5.12 | train ppl 166.868
+----------------------------------------------------------------------------------------------------
+| Eval   4 at step     1060 | time: 158.97s | valid loss  4.87 | valid ppl   130.235
+| Total time: 634.92 | Average convergence gap: 0.03% | Max convergence gap: 3.46%
+| Average absolute convergence gap: 0.16 | Max absolute convergence gap: 19.65
+| Pretrain Validation PPL: 130.23
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch   5 step     1100 |     40 batches | lr 0.01 | ms/batch 672.99 | loss  2.05 | ppl     7.732
+| epoch   5 step     1200 |    140 batches | lr 0.01 | ms/batch 555.87 | loss  5.04 | ppl   154.069
+| epoch   5 step     1300 |    240 batches | lr 0.01 | ms/batch 555.78 | loss  4.99 | ppl   146.487
+| train loss: 5.03 | train ppl 153.282
+----------------------------------------------------------------------------------------------------
+| Eval   5 at step     1325 | time: 159.01s | valid loss  4.81 | valid ppl   122.854
+| Total time: 793.99 | Average convergence gap: 0.04% | Max convergence gap: 4.78%
+| Average absolute convergence gap: 0.16 | Max absolute convergence gap: 20.75
+| Pretrain Validation PPL: 122.85
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch   6 step     1400 |     75 batches | lr 0.01 | ms/batch 673.36 | loss  3.74 | ppl    42.155
+| epoch   6 step     1500 |    175 batches | lr 0.01 | ms/batch 556.05 | loss  4.95 | ppl   141.155
+| train loss: 4.95 | train ppl 141.557
+----------------------------------------------------------------------------------------------------
+| Eval   6 at step     1590 | time: 159.09s | valid loss  4.77 | valid ppl   118.029
+| Total time: 953.11 | Average convergence gap: 0.04% | Max convergence gap: 4.35%
+| Average absolute convergence gap: 0.15 | Max absolute convergence gap: 20.12
+| Pretrain Validation PPL: 118.03
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch   7 step     1600 |     10 batches | lr 0.01 | ms/batch 673.67 | loss  0.51 | ppl     1.657
+| epoch   7 step     1700 |    110 batches | lr 0.01 | ms/batch 555.95 | loss  4.91 | ppl   136.245
+| epoch   7 step     1800 |    210 batches | lr 0.01 | ms/batch 556.01 | loss  4.86 | ppl   128.520
+| train loss: 4.90 | train ppl 134.422
+----------------------------------------------------------------------------------------------------
+| Eval   7 at step     1855 | time: 159.10s | valid loss  4.74 | valid ppl   114.408
+| Total time: 1112.23 | Average convergence gap: 0.06% | Max convergence gap: 8.91%
+| Average absolute convergence gap: 0.28 | Max absolute convergence gap: 41.76
+| Pretrain Validation PPL: 114.41
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch   8 step     1900 |     45 batches | lr 0.01 | ms/batch 673.52 | loss  2.20 | ppl     9.065
+| epoch   8 step     2000 |    145 batches | lr 0.01 | ms/batch 556.12 | loss  4.87 | ppl   130.343
+| epoch   8 step     2100 |    245 batches | lr 0.01 | ms/batch 556.22 | loss  4.80 | ppl   122.097
+| train loss: 4.85 | train ppl 128.081
+----------------------------------------------------------------------------------------------------
+| Eval   8 at step     2120 | time: 159.12s | valid loss  4.72 | valid ppl   112.519
+| Total time: 1271.35 | Average convergence gap: 0.04% | Max convergence gap: 4.69%
+| Average absolute convergence gap: 0.18 | Max absolute convergence gap: 24.52
+| Pretrain Validation PPL: 112.52
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch   9 step     2200 |     80 batches | lr 0.01 | ms/batch 673.52 | loss  3.89 | ppl    48.673
+| epoch   9 step     2300 |    180 batches | lr 0.01 | ms/batch 556.06 | loss  4.81 | ppl   123.099
+| train loss: 4.82 | train ppl 124.446
+----------------------------------------------------------------------------------------------------
+| Eval   9 at step     2385 | time: 159.10s | valid loss  4.68 | valid ppl   108.309
+| Total time: 1430.49 | Average convergence gap: 0.10% | Max convergence gap: 15.80%
+| Average absolute convergence gap: 0.50 | Max absolute convergence gap: 73.86
+| Pretrain Validation PPL: 108.31
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  10 step     2400 |     15 batches | lr 0.01 | ms/batch 673.11 | loss  0.73 | ppl     2.081
+| epoch  10 step     2500 |    115 batches | lr 0.01 | ms/batch 556.03 | loss  4.82 | ppl   123.444
+| epoch  10 step     2600 |    215 batches | lr 0.01 | ms/batch 556.23 | loss  4.75 | ppl   115.381
+| train loss: 4.79 | train ppl 120.681
+----------------------------------------------------------------------------------------------------
+| Eval  10 at step     2650 | time: 159.06s | valid loss  4.68 | valid ppl   107.653
+| Total time: 1589.58 | Average convergence gap: 0.08% | Max convergence gap: 10.83%
+| Average absolute convergence gap: 0.39 | Max absolute convergence gap: 51.26
+| Pretrain Validation PPL: 107.65
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  11 step     2700 |     50 batches | lr 0.01 | ms/batch 672.95 | loss  2.39 | ppl    10.962
+| epoch  11 step     2800 |    150 batches | lr 0.01 | ms/batch 556.21 | loss  4.77 | ppl   117.753
+| epoch  11 step     2900 |    250 batches | lr 0.01 | ms/batch 555.99 | loss  4.73 | ppl   113.032
+| train loss: 4.76 | train ppl 116.694
+----------------------------------------------------------------------------------------------------
+| Eval  11 at step     2915 | time: 159.06s | valid loss  4.66 | valid ppl   105.628
+| Total time: 1748.68 | Average convergence gap: 0.09% | Max convergence gap: 13.38%
+| Average absolute convergence gap: 0.45 | Max absolute convergence gap: 63.41
+| Pretrain Validation PPL: 105.63
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  12 step     3000 |     85 batches | lr 0.01 | ms/batch 673.05 | loss  4.04 | ppl    56.919
+| epoch  12 step     3100 |    185 batches | lr 0.01 | ms/batch 555.93 | loss  4.72 | ppl   112.449
+| train loss: 4.74 | train ppl 114.373
+----------------------------------------------------------------------------------------------------
+| Eval  12 at step     3180 | time: 159.04s | valid loss  4.65 | valid ppl   104.834
+| Total time: 1907.75 | Average convergence gap: 0.06% | Max convergence gap: 8.61%
+| Average absolute convergence gap: 0.32 | Max absolute convergence gap: 43.76
+| Pretrain Validation PPL: 104.83
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  13 step     3200 |     20 batches | lr 0.01 | ms/batch 673.11 | loss  0.95 | ppl     2.599
+| epoch  13 step     3300 |    120 batches | lr 0.01 | ms/batch 556.01 | loss  4.75 | ppl   115.088
+| epoch  13 step     3400 |    220 batches | lr 0.01 | ms/batch 556.08 | loss  4.67 | ppl   106.570
+| train loss: 4.72 | train ppl 111.953
+----------------------------------------------------------------------------------------------------
+| Eval  13 at step     3445 | time: 159.06s | valid loss  4.64 | valid ppl   103.438
+| Total time: 2066.85 | Average convergence gap: 0.07% | Max convergence gap: 9.89%
+| Average absolute convergence gap: 0.37 | Max absolute convergence gap: 50.08
+| Pretrain Validation PPL: 103.44
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  14 step     3500 |     55 batches | lr 0.01 | ms/batch 673.19 | loss  2.59 | ppl    13.293
+| epoch  14 step     3600 |    155 batches | lr 0.01 | ms/batch 556.24 | loss  4.72 | ppl   112.036
+| epoch  14 step     3700 |    255 batches | lr 0.01 | ms/batch 556.19 | loss  4.66 | ppl   105.910
+| train loss: 4.70 | train ppl 109.472
+----------------------------------------------------------------------------------------------------
+| Eval  14 at step     3710 | time: 159.09s | valid loss  4.62 | valid ppl   101.272
+| Total time: 2225.97 | Average convergence gap: 0.18% | Max convergence gap: 24.85%
+| Average absolute convergence gap: 0.85 | Max absolute convergence gap: 115.21
+| Pretrain Validation PPL: 101.27
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  15 step     3800 |     90 batches | lr 0.01 | ms/batch 673.43 | loss  4.24 | ppl    69.321
+| epoch  15 step     3900 |    190 batches | lr 0.01 | ms/batch 556.14 | loss  4.66 | ppl   105.211
+| train loss: 4.68 | train ppl 108.165
+----------------------------------------------------------------------------------------------------
+| Eval  15 at step     3975 | time: 159.10s | valid loss  4.61 | valid ppl   100.760
+| Total time: 2385.10 | Average convergence gap: 0.16% | Max convergence gap: 21.65%
+| Average absolute convergence gap: 0.82 | Max absolute convergence gap: 107.15
+| Pretrain Validation PPL: 100.76
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  16 step     4000 |     25 batches | lr 0.01 | ms/batch 673.13 | loss  1.18 | ppl     3.252
+| epoch  16 step     4100 |    125 batches | lr 0.01 | ms/batch 556.23 | loss  4.69 | ppl   109.326
+| epoch  16 step     4200 |    225 batches | lr 0.01 | ms/batch 556.21 | loss  4.61 | ppl   100.921
+| train loss: 4.67 | train ppl 106.464
+----------------------------------------------------------------------------------------------------
+| Eval  16 at step     4240 | time: 159.11s | valid loss  4.60 | valid ppl    99.554
+| Total time: 2544.23 | Average convergence gap: 0.18% | Max convergence gap: 24.18%
+| Average absolute convergence gap: 0.86 | Max absolute convergence gap: 111.42
+| Pretrain Validation PPL: 99.55
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  17 step     4300 |     60 batches | lr 0.01 | ms/batch 673.16 | loss  2.80 | ppl    16.408
+| epoch  17 step     4400 |    160 batches | lr 0.01 | ms/batch 556.19 | loss  4.67 | ppl   106.599
+| epoch  17 step     4500 |    260 batches | lr 0.01 | ms/batch 556.14 | loss  4.63 | ppl   102.039
+| train loss: 4.65 | train ppl 104.732
+----------------------------------------------------------------------------------------------------
+| Eval  17 at step     4505 | time: 159.08s | valid loss  4.62 | valid ppl   101.288
+| Total time: 2703.34 | Average convergence gap: 0.15% | Max convergence gap: 19.45%
+| Average absolute convergence gap: 0.83 | Max absolute convergence gap: 104.34
+| Pretrain Validation PPL: 101.29
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  18 step     4600 |     95 batches | lr 0.01 | ms/batch 658.48 | loss  4.43 | ppl    83.843
+| epoch  18 step     4700 |    195 batches | lr 0.01 | ms/batch 556.18 | loss  4.59 | ppl    98.891
+| train loss: 4.63 | train ppl 102.573
+----------------------------------------------------------------------------------------------------
+| Eval  18 at step     4770 | time: 157.62s | valid loss  4.60 | valid ppl    99.769
+| Total time: 2861.08 | Average convergence gap: 0.16% | Max convergence gap: 20.38%
+| Average absolute convergence gap: 0.84 | Max absolute convergence gap: 103.12
+| Pretrain Validation PPL: 99.77
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  19 step     4800 |     30 batches | lr 0.01 | ms/batch 658.44 | loss  1.39 | ppl     4.028
+| epoch  19 step     4900 |    130 batches | lr 0.01 | ms/batch 556.20 | loss  4.65 | ppl   104.308
+| epoch  19 step     5000 |    230 batches | lr 0.01 | ms/batch 556.19 | loss  4.59 | ppl    98.093
+| train loss: 4.63 | train ppl 102.381
+----------------------------------------------------------------------------------------------------
+| Eval  19 at step     5035 | time: 157.61s | valid loss  4.59 | valid ppl    98.404
+| Total time: 3018.81 | Average convergence gap: 0.16% | Max convergence gap: 21.74%
+| Average absolute convergence gap: 0.80 | Max absolute convergence gap: 107.87
+| Pretrain Validation PPL: 98.40
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  20 step     5100 |     65 batches | lr 0.01 | ms/batch 673.29 | loss  3.01 | ppl    20.309
+| epoch  20 step     5200 |    165 batches | lr 0.01 | ms/batch 555.94 | loss  4.64 | ppl   103.129
+| epoch  20 step     5300 |    265 batches | lr 0.01 | ms/batch 551.31 | loss  4.58 | ppl    97.235
+| train loss: 4.62 | train ppl 101.304
+----------------------------------------------------------------------------------------------------
+| Eval  20 at step     5300 | time: 159.07s | valid loss  4.57 | valid ppl    96.481
+| Total time: 3177.90 | Average convergence gap: 0.10% | Max convergence gap: 13.39%
+| Average absolute convergence gap: 0.49 | Max absolute convergence gap: 67.49
+| Pretrain Validation PPL: 96.48
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  21 step     5400 |    100 batches | lr 0.01 | ms/batch 677.90 | loss  4.63 | ppl   102.981
+| epoch  21 step     5500 |    200 batches | lr 0.01 | ms/batch 556.03 | loss  4.57 | ppl    96.362
+| train loss: 4.61 | train ppl 100.038
+----------------------------------------------------------------------------------------------------
+| Eval  21 at step     5565 | time: 159.07s | valid loss  4.57 | valid ppl    96.382
+| Total time: 3336.99 | Average convergence gap: 0.08% | Max convergence gap: 10.45%
+| Average absolute convergence gap: 0.46 | Max absolute convergence gap: 57.96
+| Pretrain Validation PPL: 96.38
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  22 step     5600 |     35 batches | lr 0.01 | ms/batch 673.25 | loss  1.61 | ppl     5.011
+| epoch  22 step     5700 |    135 batches | lr 0.01 | ms/batch 556.23 | loss  4.61 | ppl   100.467
+| epoch  22 step     5800 |    235 batches | lr 0.01 | ms/batch 556.14 | loss  4.56 | ppl    95.306
+| train loss: 4.60 | train ppl 99.234
+----------------------------------------------------------------------------------------------------
+| Eval  22 at step     5830 | time: 159.10s | valid loss  4.56 | valid ppl    95.255
+| Total time: 3496.10 | Average convergence gap: 0.10% | Max convergence gap: 12.73%
+| Average absolute convergence gap: 0.52 | Max absolute convergence gap: 67.97
+| Pretrain Validation PPL: 95.25
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  23 step     5900 |     70 batches | lr 0.01 | ms/batch 673.31 | loss  3.23 | ppl    25.193
+| epoch  23 step     6000 |    170 batches | lr 0.01 | ms/batch 556.11 | loss  4.61 | ppl   100.089
+| train loss: 4.59 | train ppl 98.698
+----------------------------------------------------------------------------------------------------
+| Eval  23 at step     6095 | time: 159.08s | valid loss  4.56 | valid ppl    95.222
+| Total time: 3655.21 | Average convergence gap: 0.08% | Max convergence gap: 9.72%
+| Average absolute convergence gap: 0.44 | Max absolute convergence gap: 56.16
+| Pretrain Validation PPL: 95.22
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  24 step     6100 |      5 batches | lr 0.01 | ms/batch 673.07 | loss  0.24 | ppl     1.269
+| epoch  24 step     6200 |    105 batches | lr 0.01 | ms/batch 555.96 | loss  4.60 | ppl    99.850
+| epoch  24 step     6300 |    205 batches | lr 0.01 | ms/batch 556.06 | loss  4.55 | ppl    95.106
+| train loss: 4.59 | train ppl 98.323
+----------------------------------------------------------------------------------------------------
+| Eval  24 at step     6360 | time: 159.05s | valid loss  4.55 | valid ppl    94.605
+| Total time: 3814.29 | Average convergence gap: 0.15% | Max convergence gap: 20.16%
+| Average absolute convergence gap: 0.75 | Max absolute convergence gap: 97.89
+| Pretrain Validation PPL: 94.60
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  25 step     6400 |     40 batches | lr 0.01 | ms/batch 673.19 | loss  1.85 | ppl     6.365
+| epoch  25 step     6500 |    140 batches | lr 0.01 | ms/batch 556.16 | loss  4.59 | ppl    98.563
+| epoch  25 step     6600 |    240 batches | lr 0.01 | ms/batch 556.09 | loss  4.53 | ppl    92.910
+| train loss: 4.58 | train ppl 97.384
+----------------------------------------------------------------------------------------------------
+| Eval  25 at step     6625 | time: 159.08s | valid loss  4.55 | valid ppl    94.901
+| Total time: 3973.39 | Average convergence gap: 0.09% | Max convergence gap: 12.22%
+| Average absolute convergence gap: 0.49 | Max absolute convergence gap: 62.02
+| Pretrain Validation PPL: 94.90
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  26 step     6700 |     75 batches | lr 0.01 | ms/batch 658.33 | loss  3.44 | ppl    31.280
+| epoch  26 step     6800 |    175 batches | lr 0.01 | ms/batch 556.03 | loss  4.58 | ppl    97.358
+| train loss: 4.57 | train ppl 96.577
+----------------------------------------------------------------------------------------------------
+| Eval  26 at step     6890 | time: 157.59s | valid loss  4.54 | valid ppl    94.107
+| Total time: 4131.10 | Average convergence gap: 0.10% | Max convergence gap: 12.94%
+| Average absolute convergence gap: 0.50 | Max absolute convergence gap: 64.42
+| Pretrain Validation PPL: 94.11
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  27 step     6900 |     10 batches | lr 0.01 | ms/batch 673.22 | loss  0.47 | ppl     1.599
+| epoch  27 step     7000 |    110 batches | lr 0.01 | ms/batch 556.10 | loss  4.57 | ppl    96.314
+| epoch  27 step     7100 |    210 batches | lr 0.01 | ms/batch 556.26 | loss  4.52 | ppl    92.278
+| train loss: 4.56 | train ppl 95.868
+----------------------------------------------------------------------------------------------------
+| Eval  27 at step     7155 | time: 159.09s | valid loss  4.54 | valid ppl    93.850
+| Total time: 4290.21 | Average convergence gap: 0.17% | Max convergence gap: 22.42%
+| Average absolute convergence gap: 0.82 | Max absolute convergence gap: 107.46
+| Pretrain Validation PPL: 93.85
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  28 step     7200 |     45 batches | lr 0.01 | ms/batch 673.60 | loss  2.07 | ppl     7.911
+| epoch  28 step     7300 |    145 batches | lr 0.01 | ms/batch 556.22 | loss  4.56 | ppl    95.156
+| epoch  28 step     7400 |    245 batches | lr 0.01 | ms/batch 556.06 | loss  4.53 | ppl    92.594
+| train loss: 4.56 | train ppl 95.394
+----------------------------------------------------------------------------------------------------
+| Eval  28 at step     7420 | time: 159.13s | valid loss  4.54 | valid ppl    93.808
+| Total time: 4449.32 | Average convergence gap: 0.09% | Max convergence gap: 12.75%
+| Average absolute convergence gap: 0.48 | Max absolute convergence gap: 64.77
+| Pretrain Validation PPL: 93.81
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  29 step     7500 |     80 batches | lr 0.01 | ms/batch 672.97 | loss  3.65 | ppl    38.502
+| epoch  29 step     7600 |    180 batches | lr 0.01 | ms/batch 556.10 | loss  4.57 | ppl    96.459
+| train loss: 4.56 | train ppl 95.202
+----------------------------------------------------------------------------------------------------
+| Eval  29 at step     7685 | time: 159.04s | valid loss  4.53 | valid ppl    92.959
+| Total time: 4608.39 | Average convergence gap: 0.10% | Max convergence gap: 13.89%
+| Average absolute convergence gap: 0.51 | Max absolute convergence gap: 67.66
+| Pretrain Validation PPL: 92.96
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  30 step     7700 |     15 batches | lr 0.01 | ms/batch 673.76 | loss  0.69 | ppl     2.003
+| epoch  30 step     7800 |    115 batches | lr 0.01 | ms/batch 556.12 | loss  4.55 | ppl    94.996
+| epoch  30 step     7900 |    215 batches | lr 0.01 | ms/batch 556.04 | loss  4.52 | ppl    91.558
+| train loss: 4.55 | train ppl 94.458
+----------------------------------------------------------------------------------------------------
+| Eval  30 at step     7950 | time: 159.15s | valid loss  4.54 | valid ppl    93.821
+| Total time: 4767.56 | Average convergence gap: 0.11% | Max convergence gap: 14.41%
+| Average absolute convergence gap: 0.56 | Max absolute convergence gap: 73.10
+| Pretrain Validation PPL: 93.82
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  31 step     8000 |     50 batches | lr 0.01 | ms/batch 658.31 | loss  2.29 | ppl     9.830
+| epoch  31 step     8100 |    150 batches | lr 0.01 | ms/batch 556.14 | loss  4.56 | ppl    95.266
+| epoch  31 step     8200 |    250 batches | lr 0.01 | ms/batch 556.10 | loss  4.51 | ppl    91.082
+| train loss: 4.55 | train ppl 94.223
+----------------------------------------------------------------------------------------------------
+| Eval  31 at step     8215 | time: 157.58s | valid loss  4.54 | valid ppl    93.264
+| Total time: 4925.27 | Average convergence gap: 0.08% | Max convergence gap: 11.45%
+| Average absolute convergence gap: 0.41 | Max absolute convergence gap: 59.04
+| Pretrain Validation PPL: 93.26
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  32 step     8300 |     85 batches | lr 0.01 | ms/batch 658.26 | loss  3.88 | ppl    48.338
+| epoch  32 step     8400 |    185 batches | lr 0.01 | ms/batch 556.14 | loss  4.53 | ppl    92.778
+| train loss: 4.54 | train ppl 93.863
+----------------------------------------------------------------------------------------------------
+| Eval  32 at step     8480 | time: 157.58s | valid loss  4.55 | valid ppl    95.002
+| Total time: 5082.98 | Average convergence gap: 0.10% | Max convergence gap: 13.98%
+| Average absolute convergence gap: 0.54 | Max absolute convergence gap: 72.69
+| Pretrain Validation PPL: 95.00
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  33 step     8500 |     20 batches | lr 0.01 | ms/batch 658.28 | loss  0.92 | ppl     2.509
+| epoch  33 step     8600 |    120 batches | lr 0.01 | ms/batch 556.06 | loss  4.56 | ppl    95.705
+| epoch  33 step     8700 |    220 batches | lr 0.01 | ms/batch 556.08 | loss  4.48 | ppl    88.515
+| train loss: 4.53 | train ppl 93.135
+----------------------------------------------------------------------------------------------------
+| Eval  33 at step     8745 | time: 157.58s | valid loss  4.54 | valid ppl    93.254
+| Total time: 5240.68 | Average convergence gap: 0.08% | Max convergence gap: 11.07%
+| Average absolute convergence gap: 0.43 | Max absolute convergence gap: 58.05
+| Pretrain Validation PPL: 93.25
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  34 step     8800 |     55 batches | lr 0.01 | ms/batch 658.28 | loss  2.50 | ppl    12.201
+| epoch  34 step     8900 |    155 batches | lr 0.01 | ms/batch 556.07 | loss  4.56 | ppl    95.331
+| epoch  34 step     9000 |    255 batches | lr 0.01 | ms/batch 556.10 | loss  4.51 | ppl    90.498
+| train loss: 4.54 | train ppl 93.473
+----------------------------------------------------------------------------------------------------
+| Eval  34 at step     9010 | time: 157.58s | valid loss  4.53 | valid ppl    92.454
+| Total time: 5398.39 | Average convergence gap: 0.08% | Max convergence gap: 10.98%
+| Average absolute convergence gap: 0.45 | Max absolute convergence gap: 59.01
+| Pretrain Validation PPL: 92.45
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  35 step     9100 |     90 batches | lr 0.01 | ms/batch 673.32 | loss  4.10 | ppl    60.166
+| epoch  35 step     9200 |    190 batches | lr 0.01 | ms/batch 556.01 | loss  4.50 | ppl    90.258
+| train loss: 4.53 | train ppl 93.059
+----------------------------------------------------------------------------------------------------
+| Eval  35 at step     9275 | time: 159.07s | valid loss  4.53 | valid ppl    92.430
+| Total time: 5557.47 | Average convergence gap: 0.08% | Max convergence gap: 10.39%
+| Average absolute convergence gap: 0.43 | Max absolute convergence gap: 52.88
+| Pretrain Validation PPL: 92.43
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  36 step     9300 |     25 batches | lr 0.01 | ms/batch 673.16 | loss  1.13 | ppl     3.110
+| epoch  36 step     9400 |    125 batches | lr 0.01 | ms/batch 556.06 | loss  4.55 | ppl    94.916
+| epoch  36 step     9500 |    225 batches | lr 0.01 | ms/batch 556.03 | loss  4.48 | ppl    87.801
+| train loss: 4.52 | train ppl 92.270
+----------------------------------------------------------------------------------------------------
+| Eval  36 at step     9540 | time: 159.07s | valid loss  4.53 | valid ppl    92.349
+| Total time: 5716.56 | Average convergence gap: 0.11% | Max convergence gap: 15.13%
+| Average absolute convergence gap: 0.53 | Max absolute convergence gap: 70.64
+| Pretrain Validation PPL: 92.35
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  37 step     9600 |     60 batches | lr 0.01 | ms/batch 673.92 | loss  2.71 | ppl    15.099
+| epoch  37 step     9700 |    160 batches | lr 0.01 | ms/batch 555.96 | loss  4.54 | ppl    93.263
+| epoch  37 step     9800 |    260 batches | lr 0.01 | ms/batch 556.12 | loss  4.50 | ppl    89.926
+| train loss: 4.52 | train ppl 91.863
+----------------------------------------------------------------------------------------------------
+| Eval  37 at step     9805 | time: 159.14s | valid loss  4.52 | valid ppl    92.266
+| Total time: 5875.72 | Average convergence gap: 0.10% | Max convergence gap: 14.22%
+| Average absolute convergence gap: 0.50 | Max absolute convergence gap: 68.04
+| Pretrain Validation PPL: 92.27
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  38 step     9900 |     95 batches | lr 0.01 | ms/batch 673.46 | loss  4.31 | ppl    74.386
+| epoch  38 step    10000 |    195 batches | lr 0.01 | ms/batch 556.22 | loss  4.48 | ppl    88.131
+| train loss: 4.51 | train ppl 91.265
+----------------------------------------------------------------------------------------------------
+| Eval  38 at step    10070 | time: 159.11s | valid loss  4.51 | valid ppl    90.832
+| Total time: 6034.85 | Average convergence gap: 0.09% | Max convergence gap: 12.25%
+| Average absolute convergence gap: 0.43 | Max absolute convergence gap: 58.85
+| Pretrain Validation PPL: 90.83
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  39 step    10100 |     30 batches | lr 0.01 | ms/batch 673.22 | loss  1.36 | ppl     3.892
+| epoch  39 step    10200 |    130 batches | lr 0.01 | ms/batch 556.18 | loss  4.54 | ppl    93.847
+| epoch  39 step    10300 |    230 batches | lr 0.01 | ms/batch 556.05 | loss  4.48 | ppl    87.891
+| train loss: 4.52 | train ppl 91.877
+----------------------------------------------------------------------------------------------------
+| Eval  39 at step    10335 | time: 159.08s | valid loss  4.50 | valid ppl    90.077
+| Total time: 6193.94 | Average convergence gap: 0.16% | Max convergence gap: 21.24%
+| Average absolute convergence gap: 0.78 | Max absolute convergence gap: 97.20
+| Pretrain Validation PPL: 90.08
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  40 step    10400 |     65 batches | lr 0.01 | ms/batch 673.29 | loss  2.94 | ppl    18.974
+| epoch  40 step    10500 |    165 batches | lr 0.01 | ms/batch 556.16 | loss  4.53 | ppl    92.659
+| epoch  40 step    10600 |    265 batches | lr 0.01 | ms/batch 551.22 | loss  4.47 | ppl    87.314
+| train loss: 4.51 | train ppl 91.072
+----------------------------------------------------------------------------------------------------
+| Eval  40 at step    10600 | time: 159.09s | valid loss  4.50 | valid ppl    89.849
+| Total time: 6353.05 | Average convergence gap: 0.13% | Max convergence gap: 18.73%
+| Average absolute convergence gap: 0.66 | Max absolute convergence gap: 91.58
+| Pretrain Validation PPL: 89.85
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  41 step    10700 |    100 batches | lr 0.01 | ms/batch 677.99 | loss  4.53 | ppl    92.525
+| epoch  41 step    10800 |    200 batches | lr 0.01 | ms/batch 556.06 | loss  4.46 | ppl    86.383
+| train loss: 4.50 | train ppl 90.244
+----------------------------------------------------------------------------------------------------
+| Eval  41 at step    10865 | time: 159.07s | valid loss  4.50 | valid ppl    89.989
+| Total time: 6512.15 | Average convergence gap: 0.08% | Max convergence gap: 11.04%
+| Average absolute convergence gap: 0.42 | Max absolute convergence gap: 55.37
+| Pretrain Validation PPL: 89.99
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  42 step    10900 |     35 batches | lr 0.01 | ms/batch 658.26 | loss  1.59 | ppl     4.882
+| epoch  42 step    11000 |    135 batches | lr 0.01 | ms/batch 556.20 | loss  4.53 | ppl    93.074
+| epoch  42 step    11100 |    235 batches | lr 0.01 | ms/batch 556.16 | loss  4.47 | ppl    87.069
+| train loss: 4.51 | train ppl 91.179
+----------------------------------------------------------------------------------------------------
+| Eval  42 at step    11130 | time: 157.61s | valid loss  4.50 | valid ppl    90.223
+| Total time: 6669.85 | Average convergence gap: 0.07% | Max convergence gap: 9.55%
+| Average absolute convergence gap: 0.37 | Max absolute convergence gap: 48.28
+| Pretrain Validation PPL: 90.22
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  43 step    11200 |     70 batches | lr 0.01 | ms/batch 658.33 | loss  3.16 | ppl    23.510
+| epoch  43 step    11300 |    170 batches | lr 0.01 | ms/batch 556.03 | loss  4.53 | ppl    92.759
+| train loss: 4.51 | train ppl 90.799
+----------------------------------------------------------------------------------------------------
+| Eval  43 at step    11395 | time: 157.61s | valid loss  4.50 | valid ppl    89.749
+| Total time: 6827.59 | Average convergence gap: 0.07% | Max convergence gap: 8.80%
+| Average absolute convergence gap: 0.37 | Max absolute convergence gap: 46.49
+| Pretrain Validation PPL: 89.75
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  44 step    11400 |      5 batches | lr 0.01 | ms/batch 674.15 | loss  0.24 | ppl     1.268
+| epoch  44 step    11500 |    105 batches | lr 0.01 | ms/batch 556.30 | loss  4.51 | ppl    91.164
+| epoch  44 step    11600 |    205 batches | lr 0.01 | ms/batch 556.27 | loss  4.47 | ppl    87.151
+| train loss: 4.50 | train ppl 90.268
+----------------------------------------------------------------------------------------------------
+| Eval  44 at step    11660 | time: 159.19s | valid loss  4.50 | valid ppl    90.200
+| Total time: 6986.79 | Average convergence gap: 0.07% | Max convergence gap: 10.17%
+| Average absolute convergence gap: 0.38 | Max absolute convergence gap: 50.40
+| Pretrain Validation PPL: 90.20
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  45 step    11700 |     40 batches | lr 0.01 | ms/batch 658.65 | loss  1.81 | ppl     6.137
+| epoch  45 step    11800 |    140 batches | lr 0.01 | ms/batch 556.08 | loss  4.50 | ppl    90.076
+| epoch  45 step    11900 |    240 batches | lr 0.01 | ms/batch 556.09 | loss  4.45 | ppl    85.534
+| train loss: 4.49 | train ppl 89.304
+----------------------------------------------------------------------------------------------------
+| Eval  45 at step    11925 | time: 157.60s | valid loss  4.50 | valid ppl    89.667
+| Total time: 7144.51 | Average convergence gap: 0.08% | Max convergence gap: 10.07%
+| Average absolute convergence gap: 0.39 | Max absolute convergence gap: 48.96
+| Pretrain Validation PPL: 89.67
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  46 step    12000 |     75 batches | lr 0.01 | ms/batch 673.17 | loss  3.39 | ppl    29.737
+| epoch  46 step    12100 |    175 batches | lr 0.01 | ms/batch 555.96 | loss  4.50 | ppl    89.750
+| train loss: 4.50 | train ppl 89.863
+----------------------------------------------------------------------------------------------------
+| Eval  46 at step    12190 | time: 159.04s | valid loss  4.48 | valid ppl    88.664
+| Total time: 7303.58 | Average convergence gap: 0.09% | Max convergence gap: 12.71%
+| Average absolute convergence gap: 0.46 | Max absolute convergence gap: 61.84
+| Pretrain Validation PPL: 88.66
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  47 step    12200 |     10 batches | lr 0.01 | ms/batch 673.44 | loss  0.47 | ppl     1.594
+| epoch  47 step    12300 |    110 batches | lr 0.01 | ms/batch 556.10 | loss  4.51 | ppl    90.684
+| epoch  47 step    12400 |    210 batches | lr 0.01 | ms/batch 556.28 | loss  4.46 | ppl    86.096
+| train loss: 4.50 | train ppl 89.599
+----------------------------------------------------------------------------------------------------
+| Eval  47 at step    12455 | time: 159.13s | valid loss  4.48 | valid ppl    88.464
+| Total time: 7462.73 | Average convergence gap: 0.11% | Max convergence gap: 15.05%
+| Average absolute convergence gap: 0.56 | Max absolute convergence gap: 73.56
+| Pretrain Validation PPL: 88.46
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  48 step    12500 |     45 batches | lr 0.01 | ms/batch 673.21 | loss  2.03 | ppl     7.612
+| epoch  48 step    12600 |    145 batches | lr 0.01 | ms/batch 556.07 | loss  4.49 | ppl    89.409
+| epoch  48 step    12700 |    245 batches | lr 0.01 | ms/batch 556.17 | loss  4.45 | ppl    85.801
+| train loss: 4.49 | train ppl 88.705
+----------------------------------------------------------------------------------------------------
+| Eval  48 at step    12720 | time: 159.09s | valid loss  4.50 | valid ppl    89.749
+| Total time: 7621.84 | Average convergence gap: 0.09% | Max convergence gap: 11.01%
+| Average absolute convergence gap: 0.45 | Max absolute convergence gap: 57.18
+| Pretrain Validation PPL: 89.75
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  49 step    12800 |     80 batches | lr 0.01 | ms/batch 658.50 | loss  3.61 | ppl    37.026
+| epoch  49 step    12900 |    180 batches | lr 0.01 | ms/batch 556.24 | loss  4.48 | ppl    88.073
+| train loss: 4.49 | train ppl 88.842
+----------------------------------------------------------------------------------------------------
+| Eval  49 at step    12985 | time: 157.61s | valid loss  4.48 | valid ppl    88.186
+| Total time: 7779.56 | Average convergence gap: 0.14% | Max convergence gap: 18.50%
+| Average absolute convergence gap: 0.71 | Max absolute convergence gap: 91.78
+| Pretrain Validation PPL: 88.19
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  50 step    13000 |     15 batches | lr 0.01 | ms/batch 673.28 | loss  0.69 | ppl     1.986
+| epoch  50 step    13100 |    115 batches | lr 0.01 | ms/batch 556.16 | loss  4.50 | ppl    90.038
+| epoch  50 step    13200 |    215 batches | lr 0.01 | ms/batch 556.05 | loss  4.43 | ppl    84.167
+| train loss: 4.48 | train ppl 88.373
+----------------------------------------------------------------------------------------------------
+| Eval  50 at step    13250 | time: 159.09s | valid loss  4.49 | valid ppl    89.148
+| Total time: 7938.66 | Average convergence gap: 0.09% | Max convergence gap: 11.80%
+| Average absolute convergence gap: 0.45 | Max absolute convergence gap: 58.08
+| Pretrain Validation PPL: 89.15
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  51 step    13300 |     50 batches | lr 0.01 | ms/batch 658.42 | loss  2.25 | ppl     9.514
+| epoch  51 step    13400 |    150 batches | lr 0.01 | ms/batch 555.99 | loss  4.49 | ppl    88.960
+| epoch  51 step    13500 |    250 batches | lr 0.01 | ms/batch 556.19 | loss  4.45 | ppl    85.520
+| train loss: 4.48 | train ppl 88.362
+----------------------------------------------------------------------------------------------------
+| Eval  51 at step    13515 | time: 157.59s | valid loss  4.49 | valid ppl    88.750
+| Total time: 8096.36 | Average convergence gap: 0.14% | Max convergence gap: 19.56%
+| Average absolute convergence gap: 0.70 | Max absolute convergence gap: 95.01
+| Pretrain Validation PPL: 88.75
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  52 step    13600 |     85 batches | lr 0.01 | ms/batch 658.30 | loss  3.82 | ppl    45.639
+| epoch  52 step    13700 |    185 batches | lr 0.01 | ms/batch 556.14 | loss  4.47 | ppl    87.368
+| train loss: 4.48 | train ppl 88.033
+----------------------------------------------------------------------------------------------------
+| Eval  52 at step    13780 | time: 157.60s | valid loss  4.49 | valid ppl    89.437
+| Total time: 8254.08 | Average convergence gap: 0.11% | Max convergence gap: 15.78%
+| Average absolute convergence gap: 0.57 | Max absolute convergence gap: 79.79
+| Pretrain Validation PPL: 89.44
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  53 step    13800 |     20 batches | lr 0.01 | ms/batch 658.44 | loss  0.90 | ppl     2.468
+| epoch  53 step    13900 |    120 batches | lr 0.01 | ms/batch 556.24 | loss  4.51 | ppl    90.996
+| epoch  53 step    14000 |    220 batches | lr 0.01 | ms/batch 556.09 | loss  4.43 | ppl    83.530
+| train loss: 4.48 | train ppl 88.259
+----------------------------------------------------------------------------------------------------
+| Eval  53 at step    14045 | time: 157.61s | valid loss  4.48 | valid ppl    88.496
+| Total time: 8411.80 | Average convergence gap: 0.11% | Max convergence gap: 14.30%
+| Average absolute convergence gap: 0.52 | Max absolute convergence gap: 68.45
+| Pretrain Validation PPL: 88.50
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  54 step    14100 |     55 batches | lr 0.01 | ms/batch 658.41 | loss  2.47 | ppl    11.802
+| epoch  54 step    14200 |    155 batches | lr 0.01 | ms/batch 556.13 | loss  4.50 | ppl    89.627
+| epoch  54 step    14300 |    255 batches | lr 0.01 | ms/batch 556.08 | loss  4.44 | ppl    84.821
+| train loss: 4.47 | train ppl 87.673
+----------------------------------------------------------------------------------------------------
+| Eval  54 at step    14310 | time: 157.60s | valid loss  4.50 | valid ppl    89.600
+| Total time: 8569.51 | Average convergence gap: 0.06% | Max convergence gap: 7.19%
+| Average absolute convergence gap: 0.32 | Max absolute convergence gap: 39.22
+| Pretrain Validation PPL: 89.60
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  55 step    14400 |     90 batches | lr 0.01 | ms/batch 658.49 | loss  4.06 | ppl    58.200
+| epoch  55 step    14500 |    190 batches | lr 0.01 | ms/batch 556.06 | loss  4.45 | ppl    85.438
+| train loss: 4.48 | train ppl 88.247
+----------------------------------------------------------------------------------------------------
+| Eval  55 at step    14575 | time: 157.62s | valid loss  4.49 | valid ppl    89.348
+| Total time: 8727.22 | Average convergence gap: 0.08% | Max convergence gap: 9.81%
+| Average absolute convergence gap: 0.39 | Max absolute convergence gap: 49.56
+| Pretrain Validation PPL: 89.35
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  56 step    14600 |     25 batches | lr 0.01 | ms/batch 658.60 | loss  1.13 | ppl     3.083
+| epoch  56 step    14700 |    125 batches | lr 0.01 | ms/batch 556.38 | loss  4.50 | ppl    90.151
+| epoch  56 step    14800 |    225 batches | lr 0.01 | ms/batch 556.03 | loss  4.43 | ppl    83.521
+| train loss: 4.48 | train ppl 87.861
+----------------------------------------------------------------------------------------------------
+| Eval  56 at step    14840 | time: 157.62s | valid loss  4.48 | valid ppl    88.031
+| Total time: 8884.96 | Average convergence gap: 0.10% | Max convergence gap: 13.21%
+| Average absolute convergence gap: 0.50 | Max absolute convergence gap: 64.30
+| Pretrain Validation PPL: 88.03
+| Unrolling to DEQ conversion change: 0.00%
+----------------------------------------------------------------------------------------------------
+| epoch  57 step    14900 |     60 batches | lr 0.01 | ms/batch 674.06 | loss  2.69 | ppl    14.685
+| epoch  57 step    15000 |    160 batches | lr 0.01 | ms/batch 556.07 | loss  4.49 | ppl    89.264
+| epoch  57 step    15100 |    260 batches | lr 0.01 | ms/batch 3034.74 | loss  4.43 | ppl    84.326
+| train loss: 4.47 | train ppl 87.151
+!! Converted Model !!
+----------------------------------------------------------------------------------------------------
+| Eval  57 at step    15105 | time: 488.28s | valid loss  4.48 | valid ppl    88.550
+| Total time: 9373.34 | Average convergence gap: 0.05% | Max convergence gap: 8.33%
+| Average absolute convergence gap: 0.40 | Max absolute convergence gap: 58.59
+| Pretrain Validation PPL: 90.76
+| Unrolling to DEQ conversion change: 0.20%
+----------------------------------------------------------------------------------------------------
+| epoch  58 step    15200 |     95 batches | lr 0.01 | ms/batch 3822.12 | loss  4.26 | ppl    71.108
+| epoch  58 step    15300 |    195 batches | lr 0.01 | ms/batch 3029.97 | loss  4.43 | ppl    83.920
+| train loss: 4.46 | train ppl 86.503
+----------------------------------------------------------------------------------------------------
+| Eval  58 at step    15370 | time: 882.25s | valid loss  4.48 | valid ppl    87.840
+| Total time: 10256.26 | Average convergence gap: 0.06% | Max convergence gap: 9.29%
+| Average absolute convergence gap: 0.45 | Max absolute convergence gap: 73.53
+| Pretrain Validation PPL: 90.14
+| Unrolling to DEQ conversion change: 0.21%
+----------------------------------------------------------------------------------------------------
+| epoch  59 step    15400 |     30 batches | lr 0.01 | ms/batch 3837.37 | loss  1.34 | ppl     3.807
+| epoch  59 step    15500 |    130 batches | lr 0.01 | ms/batch 3030.38 | loss  4.46 | ppl    86.348
+| epoch  59 step    15600 |    230 batches | lr 0.01 | ms/batch 3030.81 | loss  4.42 | ppl    82.798
+| train loss: 4.45 | train ppl 85.467
+----------------------------------------------------------------------------------------------------
+| Eval  59 at step    15635 | time: 883.65s | valid loss  4.48 | valid ppl    88.340
+| Total time: 11140.47 | Average convergence gap: 0.07% | Max convergence gap: 11.46%
+| Average absolute convergence gap: 0.54 | Max absolute convergence gap: 85.46
+| Pretrain Validation PPL: 90.03
+| Unrolling to DEQ conversion change: 0.20%
+----------------------------------------------------------------------------------------------------
+| epoch  60 step    15700 |     65 batches | lr 0.01 | ms/batch 3818.33 | loss  3.01 | ppl    20.251
+| epoch  60 step    15800 |    165 batches | lr 0.01 | ms/batch 3023.54 | loss  4.62 | ppl   101.567
+| epoch  60 step    15900 |    265 batches | lr 0.01 | ms/batch 2995.80 | loss  4.46 | ppl    86.460
+| train loss: 4.57 | train ppl 96.278
+----------------------------------------------------------------------------------------------------
+| Eval  60 at step    15900 | time: 880.44s | valid loss  4.48 | valid ppl    88.648
+| Total time: 12021.50 | Average convergence gap: 0.21% | Max convergence gap: 27.78%
+| Average absolute convergence gap: 2.79 | Max absolute convergence gap: 371.04
+| Pretrain Validation PPL: 95.91
+| Unrolling to DEQ conversion change: 0.42%
+----------------------------------------------------------------------------------------------------
+| epoch  61 step    16000 |    100 batches | lr 0.001 | ms/batch 3837.16 | loss  4.51 | ppl    90.716
+| epoch  61 step    16100 |    200 batches | lr 0.001 | ms/batch 3019.77 | loss  4.34 | ppl    76.586
+| train loss: 4.39 | train ppl 80.827
+----------------------------------------------------------------------------------------------------
+| Eval  61 at step    16165 | time: 879.26s | valid loss  4.45 | valid ppl    85.647
+| Total time: 12901.37 | Average convergence gap: 0.22% | Max convergence gap: 30.37%
+| Average absolute convergence gap: 2.84 | Max absolute convergence gap: 478.84
+| Pretrain Validation PPL: 90.07
+| Unrolling to DEQ conversion change: 0.35%
+----------------------------------------------------------------------------------------------------
+| epoch  62 step    16200 |     35 batches | lr 0.001 | ms/batch 3825.89 | loss  1.56 | ppl     4.782
+| epoch  62 step    16300 |    135 batches | lr 0.001 | ms/batch 3020.98 | loss  4.41 | ppl    81.983
+| epoch  62 step    16400 |    235 batches | lr 0.001 | ms/batch 3020.55 | loss  4.25 | ppl    70.242
+| train loss: 4.35 | train ppl 77.504
+----------------------------------------------------------------------------------------------------
+| Eval  62 at step    16430 | time: 881.75s | valid loss  4.43 | valid ppl    84.336
+| Total time: 13783.73 | Average convergence gap: 0.21% | Max convergence gap: 30.18%
+| Average absolute convergence gap: 2.88 | Max absolute convergence gap: 452.13
+| Pretrain Validation PPL: 88.70
+| Unrolling to DEQ conversion change: 0.33%
+----------------------------------------------------------------------------------------------------
+| epoch  63 step    16500 |     70 batches | lr 0.001 | ms/batch 3833.08 | loss  3.07 | ppl    21.618
+| epoch  63 step    16600 |    170 batches | lr 0.001 | ms/batch 3020.58 | loss  4.36 | ppl    77.891
+| train loss: 4.32 | train ppl 74.876
+----------------------------------------------------------------------------------------------------
+| Eval  63 at step    16695 | time: 881.05s | valid loss  4.43 | valid ppl    83.592
+| Total time: 14665.34 | Average convergence gap: 0.21% | Max convergence gap: 29.78%
+| Average absolute convergence gap: 2.95 | Max absolute convergence gap: 419.87
+| Pretrain Validation PPL: 87.94
+| Unrolling to DEQ conversion change: 0.33%
+----------------------------------------------------------------------------------------------------
+| epoch  64 step    16700 |      5 batches | lr 0.001 | ms/batch 3832.01 | loss  0.23 | ppl     1.260
+| epoch  64 step    16800 |    105 batches | lr 0.001 | ms/batch 3019.89 | loss  4.37 | ppl    78.941
+| epoch  64 step    16900 |    205 batches | lr 0.001 | ms/batch 3017.25 | loss  4.25 | ppl    70.323
+| train loss: 4.30 | train ppl 73.590
+----------------------------------------------------------------------------------------------------
+| Eval  64 at step    16960 | time: 881.03s | valid loss  4.42 | valid ppl    82.761
+| Total time: 15546.71 | Average convergence gap: 0.20% | Max convergence gap: 29.35%
+| Average absolute convergence gap: 3.03 | Max absolute convergence gap: 444.46
+| Pretrain Validation PPL: 87.47
+| Unrolling to DEQ conversion change: 0.32%
+----------------------------------------------------------------------------------------------------
+| epoch  65 step    17000 |     40 batches | lr 0.001 | ms/batch 3823.73 | loss  1.76 | ppl     5.796
+| epoch  65 step    17100 |    140 batches | lr 0.001 | ms/batch 3017.32 | loss  4.31 | ppl    74.739
+| epoch  65 step    17200 |    240 batches | lr 0.001 | ms/batch 3017.19 | loss  4.19 | ppl    65.814
+| train loss: 4.28 | train ppl 71.906
+----------------------------------------------------------------------------------------------------
+| Eval  65 at step    17225 | time: 880.18s | valid loss  4.41 | valid ppl    82.424
+| Total time: 16427.51 | Average convergence gap: 0.20% | Max convergence gap: 28.59%
+| Average absolute convergence gap: 3.09 | Max absolute convergence gap: 468.04
+| Pretrain Validation PPL: 86.74
+| Unrolling to DEQ conversion change: 0.32%
+----------------------------------------------------------------------------------------------------
+| epoch  66 step    17300 |     75 batches | lr 0.001 | ms/batch 3823.49 | loss  3.25 | ppl    25.699
+| epoch  66 step    17400 |    175 batches | lr 0.001 | ms/batch 3017.93 | loss  4.28 | ppl    71.946
+| train loss: 4.26 | train ppl 70.562
+----------------------------------------------------------------------------------------------------
+| Eval  66 at step    17490 | time: 880.31s | valid loss  4.41 | valid ppl    81.941
+| Total time: 17308.43 | Average convergence gap: 0.19% | Max convergence gap: 29.05%
+| Average absolute convergence gap: 3.17 | Max absolute convergence gap: 541.73
+| Pretrain Validation PPL: 86.32
+| Unrolling to DEQ conversion change: 0.32%
 ----------------------------------------------------------------------------------------------------
 ====================================================================================================
-| End of training | test loss  4.42 | test ppl    83.357
+| End of training | test loss  4.36 | test ppl    78.585
 | Maximum memory usage: 5568.28MB
 ====================================================================================================
