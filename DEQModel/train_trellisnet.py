@@ -156,7 +156,7 @@ result_log = []
 if args.timing:
     result_log.append(("Epoch", "Total Runtime", "Training Perplexity", "Validation Perplexity"))
 elif args.force_deq_validation:
-    result_log.append(("Epoch", "Total Runtime", "Training Perplexity", "Unrolled Validation Perplexity", "DEQ Validation Perplexity", 
+    result_log.append(("Epoch", "Total Runtime", "Training Perplexity", "DEQ Validation Perplexity", "Unrolled Validation Perplexity", 
                    "Average Convergence Gap", "Maximum Convergence Gap", "Average Absolute Convergence Gap", "Maximum Absolute Convergence Gap"))
 else:
     result_log.append(("Epoch", "Total Runtime", "Training Perplexity", "Validation Perplexity", "Average Convergence Gap", "Maximum Convergence Gap", 
@@ -444,10 +444,11 @@ try:
         if args.epochs is not None:
             if epoch == args.epochs:
                 break
-
+            
         if args.time_limit is not None:
             if time.process_time() - start_time >= args.time_limit:
                 break
+
         train_loss = train()
         val_loss, (pretrain_loss, val_av_cg, val_max_cg, val_abs_av_cg, val_abs_max_cg, conversion_change) = evaluate(va_iter)
         logging('-' * 100)
