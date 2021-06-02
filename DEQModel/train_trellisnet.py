@@ -269,7 +269,7 @@ def evaluate(eval_iter):
 
             if args.force_deq_validation and not args.timing:
                 # Get the pretraining output for later comparison
-                (_, _, pretraining_output), _ = model(data, target, mems, train_step=args.start_train_steps, f_thres=args.f_thres,
+                (_, _, pretraining_output), _ = model(data, target, mems, train_step=0, f_thres=args.f_thres,
                                                                     b_thres=args.b_thres, subseq_len=subseq_len, decode=False)
                 # TODO - optional conversion (diagonal method)
                 loss = criterion(model.decoder.weight, model.decoder.bias, 
@@ -280,7 +280,7 @@ def evaluate(eval_iter):
             analytics={'convergence_gap':None, "abs_convergence_distance": None, "cg_smoothing": smoothing} if not args.timing else {}
             
             # output has dimension (seq_len x bsz x nout)
-            logging_step = args.pretrain_steps if args.force_deq_validation else train_step # If we've forget DEQ logging, set the step to after pretraining.
+            logging_step = -1 if args.force_deq_validation else train_step # If we've forget DEQ logging, set the step to after pretraining.
             
             (_, _, output), _ = model(data, target, mems, train_step=train_step, f_thres=args.f_thres, 
                                          b_thres=args.b_thres, subseq_len=subseq_len, decode=False, analytics=analytics) 
