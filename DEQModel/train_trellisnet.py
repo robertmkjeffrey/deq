@@ -464,7 +464,7 @@ try:
             logging(f"| Total time: {total_runtime:.2f} | Average convergence gap: {val_av_cg*100:.2f}% | Max convergence gap: {val_max_cg*100:.2f}%")
             logging(f"| Average absolute convergence gap: {val_abs_av_cg:.2f} | Max absolute convergence gap: {val_abs_max_cg:.2f}")
         
-        if args.force_deq_validation:
+        if args.force_deq_validation and not args.timing:
             logging(f"| Pretrain Validation PPL: {math.exp(pretrain_loss):.2f}")
         if conversion_change is not None:
             logging(f"| Unrolling to DEQ conversion change: {conversion_change*100:.2f}%")
